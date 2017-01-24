@@ -30,8 +30,8 @@ object fInvoice: TfInvoice
     Caption = 'Address'
   end
   object lblShipTo: TLabel
-    Left = 384
-    Top = 79
+    Left = 303
+    Top = 88
     Width = 35
     Height = 13
     Caption = 'Ship To'
@@ -122,10 +122,18 @@ object fInvoice: TfInvoice
   object ListBoxAddress: TListBox
     Left = 84
     Top = 88
-    Width = 121
+    Width = 189
     Height = 97
     ItemHeight = 13
     TabOrder = 2
+  end
+  object ListBoxShipTo: TListBox
+    Left = 344
+    Top = 88
+    Width = 189
+    Height = 97
+    ItemHeight = 13
+    TabOrder = 3
   end
   object dscCustomer: TDataSource
     DataSet = dmoInvoice.dstCustomer

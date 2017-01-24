@@ -16,17 +16,22 @@ File_13=TSourceModule,'C:\Develop\MembershipMDB\fCardReportU.pas',0,1,94,1,107,0
 File_14=TSourceModule,'C:\Develop\MembershipMDB\fReportRangesU.pas',0,1,46,1,66,0,0,,
 
 [Modules]
-Module0=C:\Develop\Membership\fInvoiceU.pas
-Count=1
+Module0=C:\Develop\Membership\dmoInvoiceU.pas
+Module1=C:\Develop\Membership\fInvoiceU.pas
+Count=2
 EditWindowCount=1
+
+[C:\Develop\Membership\dmoInvoiceU.pas]
+ModuleType=TSourceModule
 
 [C:\Develop\Membership\fInvoiceU.pas]
 ModuleType=TSourceModule
 
 [EditWindow0]
-ViewCount=1
-CurrentEditView=C:\Develop\Membership\fInvoiceU.pas
+ViewCount=2
+CurrentEditView=C:\Develop\Membership\dmoInvoiceU.pas
 View0=0
+View1=1
 PercentageSizes=1
 Create=1
 Visible=1
@@ -59,13 +64,24 @@ BottomMiddelPanelData=0000080001020200000009000000446F636B5369746530100000004772
 [View0]
 CustomEditViewType=TEditView
 Module=C:\Develop\Membership\fInvoiceU.pas
-CursorX=1
-CursorY=1
+CursorX=27
+CursorY=86
 TopLine=82
 LeftCol=1
 Elisions=
 Bookmarks=
 EditViewName=C:\Develop\Membership\fInvoiceU.pas
+
+[View1]
+CustomEditViewType=TEditView
+Module=C:\Develop\Membership\dmoInvoiceU.pas
+CursorX=42
+CursorY=126
+TopLine=102
+LeftCol=1
+Elisions=
+Bookmarks=
+EditViewName=C:\Develop\Membership\dmoInvoiceU.pas
 
 [UndockedDesigner]
 Count=0
@@ -300,8 +316,8 @@ SplitPos=111
 
 [PropInspDesignerSelection]
 ArrangeBy=Name
-SelectedItem=Name,
-ExpandedItems=Anchors=0,BorderIcons=0,LiveBindings=0,"LiveBindings Designer=0",Margins=0
+SelectedItem=CommandText,
+ExpandedItems=Anchors=0,BorderIcons=0,LiveBindings=0,"LiveBindings Designer=0",Margins=0,Connection=0
 
 [frmDesignPreview]
 PercentageSizes=1

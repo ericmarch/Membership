@@ -20,6 +20,7 @@ type
     spdBtnInvRecord: TSpeedButton;
     lbledtInvNumber: TLabeledEdit;
     ListBoxAddress: TListBox;
+    ListBoxShipTo: TListBox;
     procedure FormShow(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);

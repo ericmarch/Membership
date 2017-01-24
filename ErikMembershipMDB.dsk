@@ -16,20 +16,20 @@ File_13=TSourceModule,'C:\Develop\MembershipMDB\fCardReportU.pas',0,1,94,1,107,0
 File_14=TSourceModule,'C:\Develop\MembershipMDB\fReportRangesU.pas',0,1,46,1,66,0,0,,
 
 [Modules]
-Module0=C:\Develop\Membership\dmoInvoiceU.pas
-Module1=C:\Develop\Membership\fInvoiceU.pas
+Module0=C:\Develop\Membership\fInvoiceU.pas
+Module1=C:\Develop\Membership\dmoInvoiceU.pas
 Count=2
 EditWindowCount=1
-
-[C:\Develop\Membership\dmoInvoiceU.pas]
-ModuleType=TSourceModule
 
 [C:\Develop\Membership\fInvoiceU.pas]
 ModuleType=TSourceModule
 
+[C:\Develop\Membership\dmoInvoiceU.pas]
+ModuleType=TSourceModule
+
 [EditWindow0]
 ViewCount=2
-CurrentEditView=C:\Develop\Membership\dmoInvoiceU.pas
+CurrentEditView=C:\Develop\Membership\fInvoiceU.pas
 View0=0
 View1=1
 PercentageSizes=1
@@ -64,19 +64,19 @@ BottomMiddelPanelData=0000080001020200000009000000446F636B5369746530100000004772
 [View0]
 CustomEditViewType=TEditView
 Module=C:\Develop\Membership\fInvoiceU.pas
-CursorX=27
-CursorY=86
-TopLine=82
+CursorX=5
+CursorY=87
+TopLine=83
 LeftCol=1
 Elisions=
 Bookmarks=
-EditViewName=C:\Develop\Membership\fInvoiceU.pas
+EditViewName=Borland.FormDesignerView
 
 [View1]
 CustomEditViewType=TEditView
 Module=C:\Develop\Membership\dmoInvoiceU.pas
-CursorX=42
-CursorY=126
+CursorX=34
+CursorY=120
 TopLine=102
 LeftCol=1
 Elisions=
@@ -316,8 +316,8 @@ SplitPos=111
 
 [PropInspDesignerSelection]
 ArrangeBy=Name
-SelectedItem=CommandText,
-ExpandedItems=Anchors=0,BorderIcons=0,LiveBindings=0,"LiveBindings Designer=0",Margins=0,Connection=0
+SelectedItem=MultiSelect,
+ExpandedItems=Anchors=0,BorderIcons=0,LiveBindings=0,"LiveBindings Designer=0",Margins=0,Connection=0,BevelEdges=0,Constraints=0,Font=0
 
 [frmDesignPreview]
 PercentageSizes=1
