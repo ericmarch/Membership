@@ -2,9 +2,9 @@
 <BorlandProject>
 	<Transactions>
     <Transaction>2017/01/23 14:06:56.000.983,=C:\Users\Client\Documents\Embarcadero\Studio\Projects\Unit1.pas</Transaction>
-    <Transaction>2017/01/23 14:07:43.000.215,C:\Develop\Membership\Unit1.pas=C:\Users\Client\Documents\Embarcadero\Studio\Projects\Unit1.pas</Transaction>
-    <Transaction>2017/01/23 14:07:43.000.215,C:\Develop\Membership\Unit1.dfm=C:\Users\Client\Documents\Embarcadero\Studio\Projects\Unit1.dfm</Transaction>
-    <Transaction>2017/01/23 14:08:02.000.208,C:\Develop\Membership\ErikMembershipMDB.dproj=C:\Users\Client\Documents\Embarcadero\Studio\Projects\Project1.dproj</Transaction>
+    <Transaction>2017/01/23 14:07:43.000.215,C:\Users\Client\Documents\Embarcadero\Studio\Projects\Unit1.dfm=C:\Develop\Membership\Unit1.dfm</Transaction>
+    <Transaction>2017/01/23 14:07:43.000.215,C:\Users\Client\Documents\Embarcadero\Studio\Projects\Unit1.pas=C:\Develop\Membership\Unit1.pas</Transaction>
+    <Transaction>2017/01/23 14:08:02.000.208,C:\Users\Client\Documents\Embarcadero\Studio\Projects\Project1.dproj=C:\Develop\Membership\ErikMembershipMDB.dproj</Transaction>
     <Transaction>2017/01/23 14:09:50.000.963,=C:\Develop\Membership\fMainU.pas</Transaction>
     <Transaction>2017/01/23 14:10:53.000.259,C:\Develop\Membership\Unit1.pas=</Transaction>
     <Transaction>2017/01/23 14:14:05.000.425,=C:\Develop\Membership\fCardMaintU.pas</Transaction>
@@ -26,5 +26,39 @@
     <Transaction>2017/01/23 18:12:02.000.789,=C:\Develop\Membership\dmoInvoiceU.pas</Transaction>
     <Transaction>2017/01/23 18:12:02.000.874,=C:\Develop\Membership\fInvoiceU.pas</Transaction>
     <Transaction>2017/01/23 18:12:03.000.088,=C:\Develop\Membership\fMemMaintU.pas</Transaction>
-  </Transactions>
+  </Transactions>  <ProjectSortOrder AutoSort="0" SortType="0">
+    <File Path="C:\Develop"/>
+    <File Path="..\Globals"/>
+    <File Path="..\Globals\globals.pas"/>
+    <File Path="dmoCardComU.pas"/>
+    <File Path="dmoCardComU.dfm"/>
+    <File Path="dmoCategoryU.pas"/>
+    <File Path="dmoCategoryU.dfm"/>
+    <File Path="dmoConnectionU.pas"/>
+    <File Path="dmoConnectionU.dfm"/>
+    <File Path="dmoInvoiceU.pas"/>
+    <File Path="dmoInvoiceU.dfm"/>
+    <File Path="dmoItemU.pas"/>
+    <File Path="dmoItemU.dfm"/>
+    <File Path="dmoMemMaintU.pas"/>
+    <File Path="dmoMemMaintU.dfm"/>
+    <File Path="fCardCommU.pas"/>
+    <File Path="fCardCommU.dfm"/>
+    <File Path="fCardMaintU.pas"/>
+    <File Path="fCardMaintU.dfm"/>
+    <File Path="fCardReportU.pas"/>
+    <File Path="fCardReportU.dfm"/>
+    <File Path="fCatMaintU.pas"/>
+    <File Path="fCatMaintU.dfm"/>
+    <File Path="fInvoiceU.pas"/>
+    <File Path="fInvoiceU.dfm"/>
+    <File Path="fItemU.pas"/>
+    <File Path="fItemU.dfm"/>
+    <File Path="fMainU.pas"/>
+    <File Path="fMainU.dfm"/>
+    <File Path="fMemMaintU.pas"/>
+    <File Path="fMemMaintU.dfm"/>
+    <File Path="fReportRangesU.pas"/>
+    <File Path="fReportRangesU.dfm"/>
+  </ProjectSortOrder>
 </BorlandProject>

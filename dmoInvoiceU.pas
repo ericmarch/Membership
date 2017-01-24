@@ -16,6 +16,7 @@ type
     procedure ReOpenDstCustomer;
     procedure SetQryCutomer;
     Function  CustAddress(LineNo: Integer):String;
+    Function  CustShipTo(LineNo: Integer):String;
   private
     { Private declarations }
     sCustCommand: String;
@@ -35,28 +36,6 @@ implementation
 uses dmoConnectionU;
 
 {$R *.dfm}
-
-function TdmoInvoice.CustAddress(LineNo: Integer): String;
-Const
-  CRLF = #13#10;
-var
-  s1, s2, s3, s4, s5, s6 :String;
-begin
-  s1:= dstCustomer.FieldByName('FirstName').AsString;
-  s1:= s1 + ' ' + dstCustomer.FieldByName('SurName').AsString;
-  s2:= dstCustomer.FieldByName('Post1').AsString;
-  s3:= dstCustomer.FieldByName('Post2').AsString;
-  s4:= dstCustomer.FieldByName('PostCity').AsString + '  ';
-  s5:= dstCustomer.FieldByName('PostState').AsString + '  ';
-  s6:= dstCustomer.FieldByName('PostPostCode').AsString;
-  case LineNo of
-    1: Result := s1;
-    2: Result := s2;
-    3: Result := s3;
-  Else
-    Result:= s4 + s5 + s6;
-  end;
-End;
 
 procedure TdmoInvoice.DataModuleCreate(Sender: TObject);
 begin
@@ -105,5 +84,49 @@ begin
   iNN:= dstCustomer.FieldByName('Card.CardID').AsInteger;
   qryInvoice.FieldByName('CardID').AsInteger:= iNN;
 End;
+
+function TdmoInvoice.CustAddress(LineNo: Integer): String;
+var
+  s1, s2, s3 :String;
+begin
+  case LineNo of
+    1: Begin
+         s1:= dstCustomer.FieldByName('FirstName').AsString;
+         s1:= s1 + ' ' + dstCustomer.FieldByName('SurName').AsString;
+         Result := s1;
+    End;
+    2: Result := dstCustomer.FieldByName('Post1').AsString;
+    3: Result := dstCustomer.FieldByName('Post2').AsString;
+  Else
+    Begin
+      s1:= dstCustomer.FieldByName('PostCity').AsString + '  ';
+      s2= dstCustomer.FieldByName('PostState').AsString + '  ';
+      s3:= dstCustomer.FieldByName('PostPostCode').AsString;
+      Result:= s1 + s2 + s3;
+    End;
+  end;
+End;
+
+function TdmoInvoice.CustShipTo(LineNo: Integer): String;
+var
+  s1, s2, s3 :String;
+begin
+  case LineNo of
+    1: Begin
+         s1:= dstCustomer.FieldByName('FirstName').AsString;
+         s1:= s1 + ' ' + dstCustomer.FieldByName('SurName').AsString;
+         Result := s1;
+    End;
+    2: Result := dstCustomer.FieldByName('Deliv1').AsString;
+    3: Result := dstCustomer.FieldByName('Deliv2').AsString;
+  Else
+    Begin
+      s1:= dstCustomer.FieldByName('DelivCity').AsString + '  ';
+      s2= dstCustomer.FieldByName('DelivState').AsString + '  ';
+      s3:= dstCustomer.FieldByName('DelivPostCode').AsString;
+      Result:= s1 + s2 + s3;
+    End;
+  end;
+end;
 
 End.

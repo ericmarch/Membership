@@ -29,8 +29,9 @@ object dmoInvoice: TdmoInvoice
       'SELECT Card.CardID, Member.CardID, Card.FirstName, Card.SurName,' +
       ' Card.Post1, Card.Post2, Card.PostCity, Card.PostState, Card.Pos' +
       'tPostCode, [SurName]+" "+[FirstName]+" "+[PostCity] AS CustAbbre' +
-      'v'#13#10'FROM Card INNER JOIN Member ON Card.CardID = Member.CardID'#13#10'O' +
-      'RDER BY [SurName]+" "+[FirstName]+" "+[PostCity]'
+      'v, '#13#10'Deliv1, Deliv2, DelivCity, DelivState, DelivPostCode'#13#10'FROM ' +
+      'Card INNER JOIN Member ON Card.CardID = Member.CardID'#13#10'ORDER BY ' +
+      '[SurName]+" "+[FirstName]+" "+[PostCity]'
     Parameters = <>
     Left = 192
     Top = 144
