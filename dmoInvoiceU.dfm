@@ -10,7 +10,7 @@ object dmoInvoice: TdmoInvoice
     Parameters = <>
     SQL.Strings = (
       'Select * FROM Invoice')
-    Left = 80
+    Left = 64
     Top = 64
   end
   object qryInvLine: TADOQuery
@@ -38,8 +38,23 @@ object dmoInvoice: TdmoInvoice
   end
   object dstInvoice: TADODataSet
     Connection = dmoConnection.conMembership
+    CommandText = 'Select * From Invoice'
     Parameters = <>
     Left = 64
     Top = 152
+  end
+  object dstItem: TADODataSet
+    Connection = dmoConnection.conMembership
+    CommandText = 'Select ItemID, ItemCode, IsInactive, Description FROM Item'
+    Parameters = <>
+    Left = 320
+    Top = 144
+  end
+  object qryInvLineTMP: TADOQuery
+    Parameters = <>
+    SQL.Strings = (
+      'Select TOP 1 InvID FROM InvLineTmp Order by InvID Desc')
+    Left = 320
+    Top = 64
   end
 end

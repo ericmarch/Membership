@@ -596,7 +596,7 @@ begin
   //  While ( NOT dstReprtCard.Eof) AND (iNN < 10) Do
   While NOT dstReportCard.Eof Do
   Begin
-    cds1.Append;
+     cds1.Append;
     cds1.Fields[0].Value:= dstReportCard.FieldByName('CardID').AsInteger;
     cds1.Fields[1].Value:= dstReportCard.FieldByName('CardCode').AsString;
     cds1.Fields[2].Value:= dstReportCard.FieldByName('Surname').AsString;
