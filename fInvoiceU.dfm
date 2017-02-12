@@ -264,8 +264,6 @@ object fInvoice: TfInvoice
       ScrollBars = ssVertical
       TabOrder = 0
       OnSelectCell = stgInvLineSelectCell
-      ExplicitLeft = 2
-      ExplicitTop = -1
       ColWidths = (
         100
         100
@@ -317,6 +315,7 @@ object fInvoice: TfInvoice
       TabOrder = 5
       Text = 'stgEditTotal'
       Visible = False
+      OnExit = stgEditTotalExit
     end
     object stgEditPrice: TEdit
       Left = 568
@@ -327,6 +326,7 @@ object fInvoice: TfInvoice
       TabOrder = 4
       Text = 'stgEditPrice'
       Visible = False
+      OnExit = stgEditPriceExit
     end
   end
   object cbxGST: TCheckBox

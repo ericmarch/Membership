@@ -71,15 +71,18 @@ type
     procedure stgEditQtyKeyUp(Sender: TObject; var Key: Word;
       Shift: TShiftState);
     procedure stgEditQtyExit(Sender: TObject);
+    procedure stgEditPriceExit(Sender: TObject);
+    procedure stgEditTotalExit(Sender: TObject);
   private
     { Private declarations }
     InvLineObj: TInvLineClass;
     sListID, sListCode, sListDescription: tStringList;
     procedure FormReset;
     procedure StrGridHeadings;
-    procedure HideStgDataBoxes;
+    procedure HideStgDataBoxes(TF: Boolean);
     procedure ItemPickList;
     procedure ItemSelected;
+    Procedure StorePrices;
     Function  fourDecimalPlaces(str: String):String;
   public
     { Public declarations }
@@ -230,18 +233,19 @@ begin
 End;
 
 
-procedure TfInvoice.HideStgDataBoxes;
+procedure TfInvoice.HideStgDataBoxes(TF: Boolean);
 begin
-  ComboBox1.Visible:= False;
-  stgEditDescription.Visible:= False;
-  stgEditQty.Visible:= False;
-  stgEditPrice.Visible:= False;
-  stgEditTotal.Visible:= False;
+  ComboBox1.Visible:= TF;
+  stgEditDescription.Visible:= TF;
+  stgEditQty.Visible:= TF;
+  stgEditPrice.Visible:= TF;
+  stgEditTotal.Visible:= TF;
 end;
+
 
 procedure TfInvoice.spdBtnInvCancelClick(Sender: TObject);
 begin
-  HideStgDataBoxes;
+  HideStgDataBoxes(True);
   FormReset;
 End;
 
@@ -254,131 +258,8 @@ End;
 
 procedure TfInvoice.spdBtnInvRecordClick(Sender: TObject);
 begin
-  HideStgDataBoxes;
+  HideStgDataBoxes(True);
 end;
-
-
-procedure TfInvoice.ItemSelected;
-Var
-  iCol, iRow, iRowCount: Integer;
-  aQty: Double;
-  aSell, aItemTotal: Currency;
-begin
-  iCol:= stgInvLine.Col;
-  iRow:= stgInvLine.Row;
-  iRowCount:= stgInvLine.RowCount;
-  if ComboBox1.ItemIndex < 0 then
-    ComboBox1.ItemIndex:= 0;
-  dmoInvoice.FindItem(strToInt(sListID[ComboBox1.ItemIndex]));
-  stgInvLine.Cells[iCol, iRow]:= ComboBox1.Items[ComboBox1.ItemIndex];
-  ComboBox1.Visible:= False;
-  stgInvLine.Cells[2, iRow]:= sListDescription[ComboBox1.ItemIndex];
-  stgEditDescription.Text:= sListDescription[ComboBox1.ItemIndex];
-  stgInvLine.Cells[3, iRow]:= '1.0000';
-  aQty:= StrToFloat(stgInvLine.Cells[3, iRow]);
-  stgEditQty.Text:= stgInvLine.Cells[3, iRow];
-  aSell:= dmoInvoice.dstItem.FieldByName('SellCost').AsCurrency;
-  stgInvLine.Cells[4, iRow]:= FloatToStrF(aSell, ffCurrency, 8, 4);
-  stgEditPrice.Text:= FloatToStrF(aSell, ffCurrency, 8, 4);
-  aItemTotal:= Round((aQty*aSell*100))/100;
-  stgInvLine.Cells[5, iRow]:= FloatToStrF(aItemTotal, ffCurrency, 10, 2);
-  stgEditTotal.Text:= FloatToStrF(aItemTotal, ffCurrency, 10, 2);
-  stgInvLine.SetFocus;
-  If (stgInvLine.Cells[1, (stgInvLine.RowCount -1)] > ' ') Then
-    stgInvLine.RowCount:= stgInvLine.RowCount + 1;
-//  ShowMessage('Line 287');
-End;
-
-
-procedure TfInvoice.ComboBox1Exit(Sender: TObject);
-begin
-  ItemSelected;
-End;
-
-
-procedure TfInvoice.ComboBox1Change(Sender: TObject);
-begin
-  ItemSelected;
-End;
-
-
-procedure TfInvoice.stgEditDescriptionChange(Sender: TObject);
-Var
-  iCol, iRow: Integer;
-begin
-  iCol:= stgInvLine.Col;
-  iRow:= stgInvLine.Row;
-  if stgEditDescription.Text > '' then
-    stgInvLine.Cells[2, iRow]:= stgEditDescription.Text
-  else
-    stgEditDescription.Text:= stgInvLine.Cells[2, iRow];
-end;
-
-
-procedure TfInvoice.stgEditQtyKeyUp(Sender: TObject; var Key: Word;
-  Shift: TShiftState);
-Var
-  MyFloat: Double;
-begin
-  if NOT (TryStrToFloat(stgEditQty.Text, MyFloat)) then
-  Begin
-    ShowMessage('Invalid quantity - No commas, letters or spaces');
-  End;
-End;
-
-
-function TfInvoice.fourDecimalPlaces(str: String): String;
-Var
-  iDecPt: Integer;
-  dNN: Double;
-  LeftPart, RightPart: String;
-begin
-  iDecPt:= AnsiPos('.', str);
-  if iDecPt > 0 then
-  Begin
-    LeftPart:= Copy(str, 1, iDecPt-1);
-    If Length(str) > iDecPt Then
-    Begin
-      RightPart:= '0.' + Copy(Copy(str, iDecPt + 1, (Length(str) - iDecPt))+ '00000', 1, 5);
-      dNN:= StrToFloat(RightPart)* 10000;
-      RightPart:= IntToStr(Round(dNN));
-    End
-    Else
-    Begin
-      RightPart:= '0000';
-    End;
-    Result:= LeftPart+'.'+RightPart;
-  End
-  Else
-  Begin
-    Result:= str+'.0000';
-  End;
-end;
-
-
-procedure TfInvoice.stgEditQtyExit(Sender: TObject);
-Var
-  iCol, iRow, iNN: Integer;
-  dQty, dPrice, dTotal: Double;
-begin
-  iCol:= 3;
-  iRow:= stgInvLine.Row;
-  if stgEditQty.Text > '' then
-  begin
-    stgInvLine.Cells[iCol, iRow]:= stgEditQty.Text;
-  end
-  else
-  begin
-    stgEditQty.Text:= stgInvLine.Cells[iCol, iRow];
-  end;
-  stgEditQty.Text:= fourDecimalPlaces(stgEditQty.Text);
-  dQty:= StrToFloat(stgEditQty.Text);
-  iNN:= Length(stgInvLine.Cells[4, iRow]);
-  dPrice:= StrToFloat(Copy(stgInvLine.Cells[4, iRow], 2, iNN-2));
-  dTotal:= (Round(dQty * dPrice * 100)/100);
-  stgEditTotal.Text:= FloatToStr(dTotal);
-  stgInvLine.Cells[5, iRow]:= '$'+stgEditTotal.Text;
-End;
 
 
 procedure TfInvoice.stgInvLineSelectCell(Sender: TObject; ACol, ARow: Integer;
@@ -386,6 +267,7 @@ procedure TfInvoice.stgInvLineSelectCell(Sender: TObject; ACol, ARow: Integer;
 Var
   R: TRect;
 begin
+  HideStgDataBoxes(True);
   if ((StrToIntDef(stgInvLine.Cells[0, aRow], 0) < 1) AND (ARow <> 0)) then
   begin
     if aRow > 1 then
@@ -467,6 +349,156 @@ begin
     ComboBox1.SetFocus;
   End;
   CanSelect:= True;
+  HideStgDataBoxes(False);
 End;
+
+
+procedure TfInvoice.ItemSelected;
+Var
+  iCol, iRow, iRowCount: Integer;
+  aQty: Double;
+  aSell, aItemTotal: Currency;
+begin
+  iCol:= stgInvLine.Col;
+  iRow:= stgInvLine.Row;
+  iRowCount:= stgInvLine.RowCount;
+  if ComboBox1.ItemIndex < 0 then
+    ComboBox1.ItemIndex:= 0;
+  dmoInvoice.FindItem(strToInt(sListID[ComboBox1.ItemIndex]));
+  stgInvLine.Cells[iCol, iRow]:= ComboBox1.Items[ComboBox1.ItemIndex];
+  ComboBox1.Visible:= False;
+  stgInvLine.Cells[2, iRow]:= sListDescription[ComboBox1.ItemIndex];
+  stgEditDescription.Text:= sListDescription[ComboBox1.ItemIndex];
+  stgInvLine.Cells[3, iRow]:= '1.0000';
+  aQty:= StrToFloat(stgInvLine.Cells[3, iRow]);
+  stgEditQty.Text:= stgInvLine.Cells[3, iRow];
+  aSell:= dmoInvoice.dstItem.FieldByName('SellCost').AsCurrency;
+  stgInvLine.Cells[4, iRow]:= FloatToStrF(aSell, ffCurrency, 8, 4);
+  stgEditPrice.Text:= FloatToStrF(aSell, ffCurrency, 8, 4);
+  aItemTotal:= Round((aQty*aSell*100))/100;
+  stgInvLine.Cells[5, iRow]:= FloatToStrF(aItemTotal, ffCurrency, 10, 2);
+  stgEditTotal.Text:= FloatToStrF(aItemTotal, ffCurrency, 10, 2);
+  stgInvLine.SetFocus;
+  If (stgInvLine.Cells[1, (stgInvLine.RowCount -1)] > ' ') Then
+    stgInvLine.RowCount:= stgInvLine.RowCount + 1;
+//  ShowMessage('Line 287');
+End;
+
+
+procedure TfInvoice.ComboBox1Exit(Sender: TObject);
+begin
+  ItemSelected;
+End;
+
+
+procedure TfInvoice.ComboBox1Change(Sender: TObject);
+begin
+  ItemSelected;
+End;
+
+
+procedure TfInvoice.stgEditDescriptionChange(Sender: TObject);
+Var
+  iCol, iRow: Integer;
+begin
+  iCol:= stgInvLine.Col;
+  iRow:= stgInvLine.Row;
+  if stgEditDescription.Text > '' then
+    stgInvLine.Cells[2, iRow]:= stgEditDescription.Text
+  else
+    stgEditDescription.Text:= stgInvLine.Cells[2, iRow];
+end;
+
+
+procedure TfInvoice.stgEditQtyKeyUp(Sender: TObject; var Key: Word;
+  Shift: TShiftState);
+Var
+  MyFloat: Double;
+begin
+  if NOT (TryStrToFloat(stgEditQty.Text, MyFloat)) then
+  Begin
+    ShowMessage('Invalid quantity - No commas, letters or spaces' + #13+#10 + '99.1234 OK');
+  End;
+End;
+
+
+function TfInvoice.fourDecimalPlaces(str: String): String;
+Var
+  iDecPt: Integer;
+  dNN: Double;
+  LeftPart, RightPart: String;
+begin
+  iDecPt:= AnsiPos('.', str);
+  if iDecPt > 0 then
+  Begin
+    LeftPart:= Copy(str, 1, iDecPt-1);
+    If Length(str) > iDecPt Then
+    Begin
+      RightPart:= '0.' + Copy(Copy(str, iDecPt + 1, (Length(str) - iDecPt))+ '00000', 1, 5);
+      dNN:= StrToFloat(RightPart)* 10000;
+      RightPart:= IntToStr(Round(dNN));
+    End
+    Else
+    Begin
+      RightPart:= '0000';
+    End;
+    Result:= LeftPart+'.'+RightPart;
+  End
+  Else
+  Begin
+    Result:= str+'.0000';
+  End;
+end;
+
+
+procedure TfInvoice.StorePrices;
+Var
+  iCol, iRow, iNN: Integer;
+  dQty, dPrice, dTotal: Double;
+begin
+  iCol:= 3;
+  iRow:= stgInvLine.Row;
+  if stgEditQty.Text > '' then
+  begin
+    stgInvLine.Cells[iCol, iRow]:= stgEditQty.Text;
+  end
+  else
+  begin
+    stgEditQty.Text:= stgInvLine.Cells[iCol, iRow];
+  end;
+  stgEditQty.Text:= fourDecimalPlaces(stgEditQty.Text);
+  dQty:= StrToFloat(stgEditQty.Text);
+  iNN:= Length(stgInvLine.Cells[4, iRow]);
+  dPrice:= StrToFloat(Copy(stgInvLine.Cells[4, iRow], 2, iNN-2));
+  dTotal:= (Round(dQty * dPrice * 100)/100);
+  stgEditTotal.Text:= FloatToStrf(dTotal, ffFixed, Length(stgEditTotal.Text)+2, 2);
+  stgInvLine.Cells[5, iRow]:= '$'+stgEditTotal.Text;
+  stgInvLine.Refresh;
+End;
+
+
+procedure TfInvoice.stgEditQtyExit(Sender: TObject);
+begin
+  StorePrices;
+End;
+
+
+procedure TfInvoice.stgEditPriceExit(Sender: TObject);
+begin
+  stgInvLine.Cells[4, stgInvLine.Row]:= stgEditPrice.Text;
+  StorePrices;
+End;
+
+procedure TfInvoice.stgEditTotalExit(Sender: TObject);
+Var
+  dPrice, dTotal: Double;
+begin
+  stgInvLine.Cells[5, stgInvLine.Row]:= stgEditTotal.Text;
+  dTotal:= StrToFloat(stgEditTotal.Text);
+  dPrice:= dTotal / (strToFloat(stgInvLine.Cells[5, stgInvLine.Row]));
+  StorePrices;
+End;
+
+
 
 End.
