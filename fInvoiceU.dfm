@@ -83,6 +83,7 @@ object fInvoice: TfInvoice
     Font.Style = [fsBold]
     ParentFont = False
     StyleElements = [seBorder]
+    OnClick = spdBtnInvRecordClick
   end
   object lblShipTo1: TLabel
     Left = 546
@@ -259,9 +260,12 @@ object fInvoice: TfInvoice
       FixedCols = 0
       RowCount = 2
       FixedRows = 0
+      Options = [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goRangeSelect, goEditing, goTabs]
       ScrollBars = ssVertical
       TabOrder = 0
       OnSelectCell = stgInvLineSelectCell
+      ExplicitLeft = 2
+      ExplicitTop = -1
       ColWidths = (
         100
         100
@@ -282,6 +286,47 @@ object fInvoice: TfInvoice
       Text = 'ComboBox1'
       OnChange = ComboBox1Change
       OnExit = ComboBox1Exit
+    end
+    object stgEditDescription: TEdit
+      Left = 252
+      Top = 32
+      Width = 121
+      Height = 21
+      TabOrder = 2
+      Text = 'stgEditDescription'
+      Visible = False
+      OnChange = stgEditDescriptionChange
+    end
+    object stgEditQty: TEdit
+      Left = 412
+      Top = 32
+      Width = 121
+      Height = 21
+      TabOrder = 3
+      Text = 'stgEditQty'
+      Visible = False
+      OnExit = stgEditQtyExit
+      OnKeyUp = stgEditQtyKeyUp
+    end
+    object stgEditTotal: TEdit
+      Left = 706
+      Top = 32
+      Width = 121
+      Height = 21
+      NumbersOnly = True
+      TabOrder = 5
+      Text = 'stgEditTotal'
+      Visible = False
+    end
+    object stgEditPrice: TEdit
+      Left = 568
+      Top = 32
+      Width = 121
+      Height = 21
+      NumbersOnly = True
+      TabOrder = 4
+      Text = 'stgEditPrice'
+      Visible = False
     end
   end
   object cbxGST: TCheckBox

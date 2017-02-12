@@ -39,6 +39,7 @@ implementation
 constructor TInvLineClass.Create(aInvID: Integer);
 begin
   inherited Create;
+  InvID:= aInvID;
  end;
 
 

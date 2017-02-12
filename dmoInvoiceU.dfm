@@ -51,10 +51,17 @@ object dmoInvoice: TdmoInvoice
     Top = 144
   end
   object qryInvLineTMP: TADOQuery
+    Connection = dmoConnection.conMembership
     Parameters = <>
     SQL.Strings = (
       'Select TOP 1 InvID FROM InvLineTmp Order by InvID Desc')
     Left = 320
     Top = 64
+  end
+  object ADOCommand1: TADOCommand
+    Connection = dmoConnection.conMembership
+    Parameters = <>
+    Left = 72
+    Top = 232
   end
 end

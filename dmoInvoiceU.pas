@@ -18,14 +18,20 @@ type
     dstInvoice: TADODataSet;
     dstItem: TADODataSet;
     qryInvLineTMP: TADOQuery;
+    ADOCommand1: TADOCommand;
     procedure DataModuleCreate(Sender: TObject);
     procedure DataModuleDestroy(Sender: TObject);
     procedure ReOpenDstCustomer;
     procedure SetQryCutomer;
+    procedure NewInvLine(fInvID:Integer);
     procedure SaveCellsToInvLineTMP(InvLineObj: TInvLineClass);
-    Function CustAddress(LineNo: Integer): String;
-    Function CustShipTo(LineNo: Integer): String;
-    Function GetNextInvID:Integer;
+    procedure CreateTmpInvLineRecord(fTmpInvID: Integer);
+    procedure DeleteTmpInvLineRecord(fTmpInvID: Integer);
+    procedure FindItem(iID: Integer);
+    Function  CustAddress(LineNo: Integer): String;
+    Function  CustShipTo(LineNo: Integer): String;
+    Function  GetNextInvID:Integer;
+    Function  GetNextTempInvID:Integer;
   private
     { Private declarations }
     sCustCommand: String;
@@ -47,12 +53,15 @@ uses dmoConnectionU;
 {$R *.dfm}
 
 procedure TdmoInvoice.DataModuleCreate(Sender: TObject);
+Var
+  iNN: Integer;
 begin
   SetDstCustCommand;
   qryInvoice.Active := True;
   qryInvLine.Active := True;
+
   dstInvoice.Active:= True;
-  qryInvLineTMP.Active:= True;
+
   dstItem.Active:= True;
   dstCustomer.Active := True;
   dstCustomer.First;
@@ -68,32 +77,59 @@ begin
   dstCustomer.Active := False;
 End;
 
+procedure TdmoInvoice.DeleteTmpInvLineRecord(fTmpInvID: Integer);
+begin
+  AdoCommand1.CommandText:= 'Delete from InvLineTMP where InvID = ' + IntToStr(fTmpInvID);
+  ADOCommand1.Execute;
+  qryInvLineTMP.Refresh;
+end;
+
+procedure TdmoInvoice.FindItem(iID: Integer);
+begin
+  dstItem.Active:= False;
+  dstItem.CommandText:= 'Select * FROM Item where ItemID = ' + IntToStr(iID);
+  dstItem.Active:= True;
+end;
+
 function TdmoInvoice.GetNextInvID: Integer;
 Var
   inn: Integer;
-  s1: String;
 begin
-  qryInvLine.Active:= False;
-  qryInvLine.Active:= True;
-  if qryInvLineTMP.RecordCount = 1 then
+  dstInvoice.Active:= False;
+  dstInvoice.CommandText:= 'Select Top 1 InvID from Invoice Order by InvID Desc';
+  dstInvoice.Active:= True;
+  if dstInvoice.RecordCount = 1 then
   Begin
-    iNN:= qryInvLineTMP.FieldByName('InvID').AsInteger;
+    iNN:= dstInvoice.FieldByName('InvID').AsInteger;
     result:= iNN + 1;
   End
   Else
   Begin
     result:= 1;
   End;
-  qryInvLine.Active:= False;
-  s1:= qryInvLineTMP.SQL.Strings[0];
-  qryInvLineTMP.SQL.Clear;
-  qryInvLineTMP.SQL.Add('Insert INTO InvLineTMP InvID VALUES ' + IntToStr(result));
-  qryInvLineTMP.Append;
-  qryInvLine.Active:= True;
+end;
 
-  qryInvLine.Active:= False;
+function TdmoInvoice.GetNextTempInvID: Integer;
+begin
+  qryInvLineTMP.Active:= False;
   qryInvLineTMP.SQL.Clear;
-  qryInvLineTMP.SQL.Add(s1);
+  qryInvLineTMP.SQL.Add('Select Top 1 InvID from InvLineTmp Order by InvID Desc');
+  qryInvLineTMP.Active:= True;
+  if qryInvLineTMP.RecordCount = 1 then
+  Begin
+    Result:= qryInvLineTMP.FieldByName('InvID').AsInteger + 1;
+  End
+  Else
+  Begin
+    result:= 1;
+  End;
+end;
+
+procedure TdmoInvoice.NewInvLine(fInvID:Integer);
+Var
+  inn: Integer;
+begin
+//  Reset all the columns where invID = fInvID
 end;
 
 procedure TdmoInvoice.ReOpenDstCustomer;
@@ -148,6 +184,12 @@ begin
   qryInvoice.FieldByName('DelivState').AsString := dstCustomer.FieldByName('DelivState').AsString;
   qryInvoice.FieldByName('DelivPostCode').AsString := dstCustomer.FieldByName('DelivPostCode').AsString;
 End;
+
+procedure TdmoInvoice.CreateTmpInvLineRecord(fTmpInvID: Integer);
+begin
+  AdoCommand1.CommandText:= 'Insert INTO InvLineTMP (InvID) VALUES (' + IntToStr(fTmpInvID)+ ')';
+  ADOCommand1.Execute;
+end;
 
 function TdmoInvoice.CustAddress(LineNo: Integer): String;
 var
