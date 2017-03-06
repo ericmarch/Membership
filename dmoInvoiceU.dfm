@@ -26,12 +26,12 @@ object dmoInvoice: TdmoInvoice
     Connection = dmoConnection.conMembership
     CursorType = ctStatic
     CommandText = 
-      'SELECT Card.CardID, Member.CardID, Card.FirstName, Card.SurName,' +
-      ' Card.Post1, Card.Post2, Card.PostCity, Card.PostState, Card.Pos' +
-      'tPostCode, [SurName]+" "+[FirstName]+" "+[PostCity] AS CustAbbre' +
-      'v, '#13#10'Deliv1, Deliv2, DelivCity, DelivState, DelivPostCode'#13#10'FROM ' +
-      'Card INNER JOIN Member ON Card.CardID = Member.CardID'#13#10'ORDER BY ' +
-      '[SurName]+" "+[FirstName]+" "+[PostCity]'
+      'SELECT Card.CardID, Member.CardID, FirstName, SurName, Card.Post' +
+      '1, Card.Post2, Card.PostCity, Card.PostState, Card.PostPostCode,' +
+      ' [SurName]+" "+[FirstName]+" "+[PostCity] AS CustAbbrev, '#13#10'Deliv' +
+      '1, Deliv2, DelivCity, DelivState, DelivPostCode'#13#10'FROM Card INNER' +
+      ' JOIN Member ON Card.CardID = Member.CardID'#13#10'ORDER BY [SurName]+' +
+      '" "+[FirstName]+" "+[PostCity]'
     Parameters = <>
     Left = 192
     Top = 144

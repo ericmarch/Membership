@@ -76,6 +76,7 @@ object fInvoice: TfInvoice
     Width = 100
     Height = 47
     Caption = 'Record'
+    Enabled = False
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clBtnText
     Font.Height = -16
@@ -111,11 +112,10 @@ object fInvoice: TfInvoice
   end
   object dblucbCustomer: TDBLookupComboBox
     Left = 380
-    Top = 28
+    Top = 26
     Width = 217
     Height = 21
     DataField = 'CardID'
-    DataSource = dscInvoice
     KeyField = 'Card.CardID'
     ListField = 'CustAbbrev'
     ListSource = dscCustomer
@@ -162,76 +162,7 @@ object fInvoice: TfInvoice
     Height = 97
     ItemHeight = 13
     TabOrder = 3
-  end
-  object dbeSurname: TDBEdit
-    Left = 643
-    Top = 68
-    Width = 232
-    Height = 21
-    DataField = 'DelivSurname'
-    DataSource = dscInvoice
-    TabOrder = 4
-    Visible = False
-  end
-  object dbeFirstName: TDBEdit
-    Left = 643
-    Top = 88
-    Width = 232
-    Height = 21
-    DataField = 'DelivFirstName'
-    DataSource = dscInvoice
-    TabOrder = 5
-    Visible = False
-  end
-  object dbeDeliv1: TDBEdit
-    Left = 643
-    Top = 107
-    Width = 232
-    Height = 21
-    DataField = 'Deliv1'
-    DataSource = dscInvoice
-    TabOrder = 6
-    Visible = False
-  end
-  object dbeDeliv2: TDBEdit
-    Left = 643
-    Top = 127
-    Width = 232
-    Height = 21
-    DataField = 'Deliv2'
-    DataSource = dscInvoice
-    TabOrder = 7
-    Visible = False
-  end
-  object DBEdit1: TDBEdit
-    Left = 643
-    Top = 147
-    Width = 232
-    Height = 21
-    DataField = 'DelivCity'
-    DataSource = dscInvoice
-    TabOrder = 8
-    Visible = False
-  end
-  object DBEdit2: TDBEdit
-    Left = 643
-    Top = 167
-    Width = 48
-    Height = 21
-    DataField = 'DelivState'
-    DataSource = dscInvoice
-    TabOrder = 9
-    Visible = False
-  end
-  object DBEdit3: TDBEdit
-    Left = 722
-    Top = 167
-    Width = 56
-    Height = 21
-    DataField = 'DelivPostCode'
-    DataSource = dscInvoice
-    TabOrder = 10
-    Visible = False
+    OnEnter = ListBoxShipToEnter
   end
   object DateTimePicker1: TDateTimePicker
     Left = 643
@@ -240,7 +171,7 @@ object fInvoice: TfInvoice
     Height = 21
     Date = 42761.871474814810000000
     Time = 42761.871474814810000000
-    TabOrder = 11
+    TabOrder = 4
   end
   object Panel1: TPanel
     Left = 0
@@ -248,7 +179,7 @@ object fInvoice: TfInvoice
     Width = 984
     Height = 280
     Align = alBottom
-    TabOrder = 12
+    TabOrder = 5
     object stgInvLine: TStringGrid
       Left = 1
       Top = 1
@@ -275,15 +206,15 @@ object fInvoice: TfInvoice
         24
         24)
     end
-    object ComboBox1: TComboBox
+    object cbxItemCode: TComboBox
       Left = 106
       Top = 32
       Width = 102
       Height = 21
       TabOrder = 1
-      Text = 'ComboBox1'
-      OnChange = ComboBox1Change
-      OnExit = ComboBox1Exit
+      Text = 'cbxItemCode'
+      OnChange = cbxItemCodeChange
+      OnExit = cbxItemCodeExit
     end
     object stgEditDescription: TEdit
       Left = 252
@@ -318,7 +249,7 @@ object fInvoice: TfInvoice
       OnExit = stgEditTotalExit
     end
     object stgEditPrice: TEdit
-      Left = 568
+      Left = 570
       Top = 32
       Width = 121
       Height = 21
@@ -337,16 +268,67 @@ object fInvoice: TfInvoice
     Caption = 'GST Inclusive'
     Checked = True
     State = cbChecked
+    TabOrder = 6
+  end
+  object edtDelivSurname: TEdit
+    Left = 643
+    Top = 68
+    Width = 232
+    Height = 21
+    TabOrder = 7
+    Visible = False
+  end
+  object edtDelivFirstName: TEdit
+    Left = 643
+    Top = 88
+    Width = 232
+    Height = 21
+    TabOrder = 8
+    Visible = False
+  end
+  object edtDeliv1: TEdit
+    Left = 643
+    Top = 108
+    Width = 232
+    Height = 21
+    TabOrder = 9
+    Visible = False
+  end
+  object edtDeliv2: TEdit
+    Left = 643
+    Top = 128
+    Width = 232
+    Height = 21
+    TabOrder = 10
+    Visible = False
+  end
+  object edtDelivCity: TEdit
+    Left = 643
+    Top = 148
+    Width = 232
+    Height = 21
+    TabOrder = 11
+    Visible = False
+  end
+  object edtDelivState: TEdit
+    Left = 643
+    Top = 168
+    Width = 56
+    Height = 21
+    TabOrder = 12
+    Visible = False
+  end
+  object edtDelivPostCode: TEdit
+    Left = 728
+    Top = 168
+    Width = 56
+    Height = 21
     TabOrder = 13
+    Visible = False
   end
   object dscCustomer: TDataSource
     DataSet = dmoInvoice.dstCustomer
-    Left = 560
-    Top = 16
-  end
-  object dscInvoice: TDataSource
-    DataSet = dmoInvoice.qryInvoice
-    Left = 472
-    Top = 16
+    Left = 296
+    Top = 104
   end
 end

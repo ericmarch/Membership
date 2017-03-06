@@ -8,6 +8,7 @@ uses
   System.SysUtils,
   System.Variants,
   System.Classes,
+  strUtils,
   Vcl.Graphics,
   Vcl.Controls,
   Vcl.Forms,
@@ -20,14 +21,13 @@ uses
   Vcl.Mask,
   Vcl.ComCtrls,
   Vcl.Grids,
-  InvLineClass,
+  InvClass,
   dmoInvoiceU;
 
 type
   TfInvoice = class(TForm)
     dscCustomer: TDataSource;
     dblucbCustomer: TDBLookupComboBox;
-    dscInvoice: TDataSource;
     lblCustomer: TLabel;
     lblPostAddr: TLabel;
     lblShipTo: TLabel;
@@ -37,53 +37,57 @@ type
     lbledtInvNumber: TLabeledEdit;
     ListBoxAddress: TListBox;
     ListBoxShipTo: TListBox;
-    dbeSurname: TDBEdit;
     lblShipTo1: TLabel;
-    dbeFirstName: TDBEdit;
     lblFirstName: TLabel;
     lblDelivAddress: TLabel;
-    dbeDeliv1: TDBEdit;
-    dbeDeliv2: TDBEdit;
-    DBEdit1: TDBEdit;
-    DBEdit2: TDBEdit;
-    DBEdit3: TDBEdit;
     DateTimePicker1: TDateTimePicker;
     Panel1: TPanel;
     cbxGST: TCheckBox;
     stgInvLine: TStringGrid;
-    ComboBox1: TComboBox;
+    cbxItemCode: TComboBox;
     stgEditDescription: TEdit;
     stgEditQty: TEdit;
     stgEditTotal: TEdit;
     stgEditPrice: TEdit;
-    procedure FormShow(Sender: TObject);
-    procedure FormCreate(Sender: TObject);
-    procedure FormDestroy(Sender: TObject);
-    procedure spdBtnInvExitClick(Sender: TObject);
-    procedure spdBtnInvCancelClick(Sender: TObject);
-    procedure dblucbCustomerExit(Sender: TObject);
-    procedure stgInvLineSelectCell(Sender: TObject; ACol, ARow: Integer;
+    edtDelivSurname: TEdit;
+    edtDelivFirstName: TEdit;
+    edtDeliv1: TEdit;
+    edtDeliv2: TEdit;
+    edtDelivCity: TEdit;
+    edtDelivState: TEdit;
+    edtDelivPostCode: TEdit;
+    Procedure FormShow(Sender: TObject);
+    Procedure FormCreate(Sender: TObject);
+    Procedure FormDestroy(Sender: TObject);
+    Procedure spdBtnInvExitClick(Sender: TObject);
+    Procedure spdBtnInvCancelClick(Sender: TObject);
+    Procedure dblucbCustomerExit(Sender: TObject);
+    Procedure stgInvLineSelectCell(Sender: TObject; ACol, ARow: Integer;
       var CanSelect: Boolean);
-    procedure ComboBox1Change(Sender: TObject);
-    procedure ComboBox1Exit(Sender: TObject);
-    procedure spdBtnInvRecordClick(Sender: TObject);
-    procedure stgEditDescriptionChange(Sender: TObject);
-    procedure stgEditQtyKeyUp(Sender: TObject; var Key: Word;
+    Procedure cbxItemCodeChange(Sender: TObject);
+    Procedure cbxItemCodeExit(Sender: TObject);
+    Procedure spdBtnInvRecordClick(Sender: TObject);
+    Procedure stgEditDescriptionChange(Sender: TObject);
+    Procedure stgEditQtyKeyUp(Sender: TObject; var Key: Word;
       Shift: TShiftState);
-    procedure stgEditQtyExit(Sender: TObject);
-    procedure stgEditPriceExit(Sender: TObject);
-    procedure stgEditTotalExit(Sender: TObject);
+    Procedure stgEditQtyExit(Sender: TObject);
+    Procedure stgEditPriceExit(Sender: TObject);
+    Procedure stgEditTotalExit(Sender: TObject);
+    Procedure ListBoxShipToEnter(Sender: TObject);
   private
     { Private declarations }
     InvLineObj: TInvLineClass;
+    InvObj: TinvClass;
     sListID, sListCode, sListDescription: tStringList;
-    procedure FormReset;
-    procedure StrGridHeadings;
-    procedure HideStgDataBoxes(TF: Boolean);
-    procedure ItemPickList;
-    procedure ItemSelected;
-    Procedure StorePrices;
+    Procedure FormReset;
+    Procedure StrGridHeadings;
+    Procedure HideStgDataBoxes(TF: Boolean);
+    Procedure ItemPickList;
+    Procedure ItemSelected;
+    Procedure CalcPrices;
+    Procedure LoadInvLine(iLineNumber: Integer);
     Function  fourDecimalPlaces(str: String):String;
+    Function  ItemInList(sItemCode: String):Boolean;
   public
     { Public declarations }
     fTop: Integer;
@@ -98,14 +102,16 @@ implementation
 
 {$R *.dfm}
 
+uses globals;
 
 
-procedure TfInvoice.dblucbCustomerExit(Sender: TObject);
+
+Procedure TfInvoice.dblucbCustomerExit(Sender: TObject);
 Var
   iNN: Integer;
   s1: String;
-begin
-  dmoInvoice.SetQryCutomer;
+Begin
+  dmoInvoice.FillInvObj(InvObj);
   ListBoxAddress.Items[0]:= dmoInvoice.CustAddress(1);
   ListBoxAddress.Items[1]:= dmoInvoice.CustAddress(2);
   iNN:= 2;
@@ -130,32 +136,54 @@ begin
 End;
 
 
-procedure TfInvoice.ItemPickList;
+Function TfInvoice.ItemInList(sItemCode: String): Boolean;
+Var
+  iNN: Integer;
+Begin
+  Result:= False;
+  If cbxItemCode.Items.Count > -1 then
+  Begin
+    For iNN := 0 to  cbxItemCode.Items.Count -1 do
+    Begin
+      If cbxItemCode.Items[iNN] = sItemCode then
+      Begin
+        Result:= True;
+      End;
+    End;
+  End;
+End;
+
+
+Procedure TfInvoice.ItemPickList;
 Var
   iNN: Integer;
   s1, s2, s3, sComboBoxText: String;
-begin
-  //----------- Fill Item StringLists ---------------------
+Begin
+  //-------------- Fill Item StringLists ------------------
   sListID:= tStringList.Create;
   sListCode:= tStringList.Create;
   sListDescription:= tStringList.Create;
   iNN:= 1;
-  ComboBox1.Visible:= False;
+//  cbxItemCode.Visible:= False;
   dmoInvoice.dstItem.First;
   while NOT dmoInvoice.dstItem.EOF do
   Begin
     s1:= IntToStr(dmoInvoice.dstItem.FieldByName('ItemID').AsInteger);
     s2:= dmoInvoice.dstItem.FieldByName('ItemCode').AsString;
     s3:= dmoInvoice.dstItem.FieldByName('Description').AsString;
-    if dmoInvoice.dstItem.FieldByName('IsInactive').AsBoolean = False then
+    if dmoInvoice.dstItem.FieldByName('IsInactive').AsBoolean = False Then
     Begin
       sListID.Add(s1);
       sListCode.Add(s2);
       sListDescription.Add(s3);
-      ComboBox1.Items.Add(s2);
-      if iNN = 1 then
-        ComboBox1.Text:= s2;
-      iNN:= iNN + 1;
+  //----------- Add ItemCode to ComboBoxItemCode ----------
+      if NOT ItemInList(s2) then
+      Begin
+        cbxItemCode.Items.Add(s2);
+        if iNN = 1 then
+          cbxItemCode.Text:= s2;
+        iNN:= iNN + 1;
+      End;
     End;
     dmoInvoice.dstItem.Next;
   End;
@@ -163,8 +191,8 @@ begin
 End;
 
 
-procedure TfInvoice.StrGridHeadings;
-begin
+Procedure TfInvoice.StrGridHeadings;
+Begin
   //---------------- StringGrid setup ----------------------
   stgInvLine.Cells[0, 0]:= 'Row';
   stgInvLine.Cells[1, 0]:= 'Item';
@@ -181,18 +209,18 @@ begin
 End;
 
 
-procedure TfInvoice.FormCreate(Sender: TObject);
+Procedure TfInvoice.FormCreate(Sender: TObject);
 var
   Rec: LongRec;
   iNN: Integer;
-begin
+Begin
   Rec := LongRec(GetFileVersion(Application.ExeName));
   Caption := 'Invoice   '
               + ExtractFileName(Application.ExeName)
               + '  v' + Format('%d.%d', [Rec.Hi, Rec.Lo]);
   dmoInvoice:= TdmoInvoice.Create(Self);
-  iNN:= dmoInvoice.GetNextTempInvID;
-  dmoInvoice.CreateTmpInvLineRecord(iNN);
+  iNN:= dmoInvoice.GetNextInvID;
+  InvObj:= TInvClass.Create(iNN);  // This invid will be replaced with latest invid when invoice is recorded
   InvLineObj:= TInvLineClass.Create(iNN);
   sListID:= tStringList.Create;
   sListCode:= tStringList.Create;
@@ -202,12 +230,12 @@ begin
 End;
 
 
-procedure TfInvoice.FormDestroy(Sender: TObject);
-begin
+Procedure TfInvoice.FormDestroy(Sender: TObject);
+Begin
   // Save last Invoice Line
   // Write out Last Invoice to permanent tables = Invoice & InvLine
   // Delete the row in InvLineTmp that contains the InvLineObj.InvID
-//  FIX THIS  dmoInvoice.DeleteTmpInvLineRecord(InvLineObj.InvID);
+  //  FIX THIS  dmoInvoice.DeleteTmpInvLineRecord(InvLineObj.InvID);
   // Free Objects and StringLists
   FreeAndNil(dmoInvoice);
   InvLineObj.Destroy;
@@ -217,25 +245,30 @@ begin
 End;
 
 
-procedure TfInvoice.FormReset;
-begin
+Procedure TfInvoice.FormReset;
+Begin
+  sListID.Destroy;  // Clear Item Lists
+  sListCode.Destroy;
+  sListDescription.Destroy;
+  ItemPickList;  // Create Item Lists.  Refresh available items in case there has been a change
   dmoInvoice.ReOpenDstCustomer;
   dblucbCustomer.KeyValue:= dmoInvoice.dstCustomer.FieldByName('Card.CardID').AsInteger;
   dblucbCustomer.SetFocus;
+  spdBtnInvRecord.Enabled:= False;
 End;
 
 
-procedure TfInvoice.FormShow(Sender: TObject);
-begin
+Procedure TfInvoice.FormShow(Sender: TObject);
+Begin
   Top:= fTop;
   Left:= fLeft;
   FormReset;
 End;
 
 
-procedure TfInvoice.HideStgDataBoxes(TF: Boolean);
-begin
-  ComboBox1.Visible:= TF;
+Procedure TfInvoice.HideStgDataBoxes(TF: Boolean);
+Begin
+  cbxItemCode.Visible:= TF;
   stgEditDescription.Visible:= TF;
   stgEditQty.Visible:= TF;
   stgEditPrice.Visible:= TF;
@@ -243,41 +276,84 @@ begin
 end;
 
 
-procedure TfInvoice.spdBtnInvCancelClick(Sender: TObject);
-begin
+Procedure TfInvoice.spdBtnInvCancelClick(Sender: TObject);
+Begin
   HideStgDataBoxes(True);
   FormReset;
 End;
 
 
-procedure TfInvoice.spdBtnInvExitClick(Sender: TObject);
-begin
+Procedure TfInvoice.spdBtnInvExitClick(Sender: TObject);
+Begin
+  If (InvObj.Recorded = False) AND (spdBtnInvRecord.Enabled = True) Then
+  Begin
+    //  Save the new invoice if respose is OK
+  End;
   Close;
 End;
 
 
-procedure TfInvoice.spdBtnInvRecordClick(Sender: TObject);
-begin
+Procedure TfInvoice.LoadInvLine(iLineNumber: Integer);
+var
+  s1: String;
+Begin
+  InvLineObj.InvID:= InvObj.InvID;
+  InvLineObj.LineNumber:= iLineNumber;
+  s1:= stgInvLine.Cells[stgInvLine.Row, 1];
+  InvLineObj.ItemID := dmoInvoice.FindItemID(s1);
+  InvLineObj.LineNumber:= iLineNumber;
+  InvLineObj.LineNumber:= iLineNumber;
+End;
+
+
+Procedure TfInvoice.spdBtnInvRecordClick(Sender: TObject);
+Var
+  iNN: Integer;
+Begin
+  ShowMessage('InvID = ' + IntToStr(InvObj.InvID) + CRLF
+        + 'InvNumber = ' + InvObj.InvNumber + CRLF + 'InvDate = ' + DateToStr(InvObj.InvDate));
+
+  InvObj.DelivSurname:= edtDelivSurname.Text;      // In Case delivery details have been changed
+  InvObj.DelivFirstName:= edtDelivFirstName.Text;
+  InvObj.Deliv1:= edtDeliv1.Text;
+  InvObj.Deliv2:= edtDeliv2.Text;
+  InvObj.DelivCity:= edtDelivCity.Text;
+  InvObj.DelivState:= edtDelivState.Text;
+  InvObj.DelivPostCode:= edtDelivPostCode.Text;
+
+  dmoInvoice.RecordInv(InvObj);
+  InvObj.Recorded:= True;
+  if stgInvLine.RowCount > 2 then
+  Begin
+    for iNN  := 1 to stgInvLine.RowCount do        // Row 0 is column headings
+    Begin
+      LoadInvLine(iNN);
+      dmoInvoice.RecordInvLine(InvLineObj);
+    End;
+  End;
+  if stgInvLine.RowCount = 2 then
+    dmoInvoice.RecordInvLine(InvLineObj);
+
   HideStgDataBoxes(True);
+  spdBtnInvRecord.Enabled:= False;
 end;
 
 
-procedure TfInvoice.stgInvLineSelectCell(Sender: TObject; ACol, ARow: Integer;
+Procedure TfInvoice.stgInvLineSelectCell(Sender: TObject; ACol, ARow: Integer;
   var CanSelect: Boolean);
 Var
   R: TRect;
-begin
-  HideStgDataBoxes(True);
+Begin
   if ((StrToIntDef(stgInvLine.Cells[0, aRow], 0) < 1) AND (ARow <> 0)) then
-  begin
+  Begin
     if aRow > 1 then
     Begin
-      dmoInvoice.SaveCellsToInvLineTMP(InvLineObj);
+      dmoInvoice.RecordInvLine(InvLineObj);
     End;
     stgInvLine.Cells[0, aRow]:= IntToStr(ARow);  // Put InvLineNumber in Column 0
   End;
   if ((ACol = 1) AND (ARow <> 0)) then
-  begin
+  Begin
     stgEditDescription.Text:= '';
     stgInvLine.Cells[2, aRow]:= '';
     stgEditQty.Text:= '1.0000';
@@ -293,10 +369,10 @@ begin
     R.Right:= R.Right + stgInvLine.Left;
     R.Top:= R.Top + stgInvLine.Top;
     R.Bottom:= R.Bottom + stgInvLine.Top;
-    ComboBox1.Left:= R.Left + 1;
-    ComboBox1.Top:= R.Top + 3;
-    ComboBox1.Width:= (R.Right + 1) - R.Left;
-    ComboBox1.Height:= (R.Bottom + 1) - R.Top;
+    cbxItemCode.Left:= R.Left + 1;
+    cbxItemCode.Top:= R.Top + 3;
+    cbxItemCode.Width:= (R.Right + 1) - R.Left;
+    cbxItemCode.Height:= (R.Bottom + 1) - R.Top;
       {Now do description column}
     R:= stgInvLine.CellRect(2, aRow);
     R.Left:= R.Left + stgInvLine.Left;
@@ -345,30 +421,46 @@ begin
     stgEditTotal.Height:= (R.Bottom + 1) - R.Top;
     stgEditTotal.Visible:= True;
       {Now we show combobox}
-    ComboBox1.Visible:= True;
-    ComboBox1.SetFocus;
+    cbxItemCode.Visible:= True;
+    cbxItemCode.SetFocus;
   End;
   CanSelect:= True;
-  HideStgDataBoxes(False);
+
+  If edtDelivSurname.Visible = True Then
+  Begin
+    edtDelivSurname.Visible:= False;
+    edtDelivFirstName.Visible:= False;
+    edtDeliv1.Visible:= False;
+    edtDeliv2.Visible:= False;
+    edtDelivCity.Visible:= False;
+    edtDelivState.Visible:= False;
+    edtDelivPostCode.Visible:= False;
+    lblShipTo1.Visible:= False;
+    lblFirstName.Visible:= False;
+    lblDelivAddress.Visible:= False;
+  End;
 End;
 
 
-procedure TfInvoice.ItemSelected;
+Procedure TfInvoice.ItemSelected;
 Var
-  iCol, iRow, iRowCount: Integer;
+  iCol, iRow, iRowCount, iItemID: Integer;
   aQty: Double;
   aSell, aItemTotal: Currency;
-begin
+Begin
+  if spdBtnInvRecord.Enabled = False then
+    spdBtnInvRecord.Enabled:= True;
   iCol:= stgInvLine.Col;
   iRow:= stgInvLine.Row;
   iRowCount:= stgInvLine.RowCount;
-  if ComboBox1.ItemIndex < 0 then
-    ComboBox1.ItemIndex:= 0;
-  dmoInvoice.FindItem(strToInt(sListID[ComboBox1.ItemIndex]));
-  stgInvLine.Cells[iCol, iRow]:= ComboBox1.Items[ComboBox1.ItemIndex];
-  ComboBox1.Visible:= False;
-  stgInvLine.Cells[2, iRow]:= sListDescription[ComboBox1.ItemIndex];
-  stgEditDescription.Text:= sListDescription[ComboBox1.ItemIndex];
+  if cbxItemCode.ItemIndex < 0 then
+    cbxItemCode.ItemIndex:= 0;
+  iItemID:= dmoInvoice.FindItemID(cbxItemCode.Text);
+//  stgInvLine.Cells[iCol, iRow]:= ComboBox1.Items[ComboBox1.ItemIndex];
+  stgInvLine.Cells[iCol, iRow]:= cbxItemCode.Text;
+//  cbxItemCode.Visible:= False;
+  stgInvLine.Cells[2, iRow]:= sListDescription[cbxItemCode.ItemIndex];
+  stgEditDescription.Text:= sListDescription[cbxItemCode.ItemIndex];
   stgInvLine.Cells[3, iRow]:= '1.0000';
   aQty:= StrToFloat(stgInvLine.Cells[3, iRow]);
   stgEditQty.Text:= stgInvLine.Cells[3, iRow];
@@ -385,22 +477,10 @@ begin
 End;
 
 
-procedure TfInvoice.ComboBox1Exit(Sender: TObject);
-begin
-  ItemSelected;
-End;
-
-
-procedure TfInvoice.ComboBox1Change(Sender: TObject);
-begin
-  ItemSelected;
-End;
-
-
-procedure TfInvoice.stgEditDescriptionChange(Sender: TObject);
+Procedure TfInvoice.stgEditDescriptionChange(Sender: TObject);
 Var
   iCol, iRow: Integer;
-begin
+Begin
   iCol:= stgInvLine.Col;
   iRow:= stgInvLine.Row;
   if stgEditDescription.Text > '' then
@@ -410,11 +490,11 @@ begin
 end;
 
 
-procedure TfInvoice.stgEditQtyKeyUp(Sender: TObject; var Key: Word;
+Procedure TfInvoice.stgEditQtyKeyUp(Sender: TObject; var Key: Word;
   Shift: TShiftState);
 Var
   MyFloat: Double;
-begin
+Begin
   if NOT (TryStrToFloat(stgEditQty.Text, MyFloat)) then
   Begin
     ShowMessage('Invalid quantity - No commas, letters or spaces' + #13+#10 + '99.1234 OK');
@@ -422,83 +502,148 @@ begin
 End;
 
 
-function TfInvoice.fourDecimalPlaces(str: String): String;
+Function TfInvoice.fourDecimalPlaces(str: String): String;
 Var
-  iDecPt: Integer;
+  iDecPt, iNN: Integer;
   dNN: Double;
   LeftPart, RightPart: String;
-begin
+Begin
+  str:= MyStripOut(str);
   iDecPt:= AnsiPos('.', str);
-  if iDecPt > 0 then
+  if iDecPt = 0 then
+  Begin
+    LeftPart:= str;
+    RightPart:= '0000';
+  End
+  Else
   Begin
     LeftPart:= Copy(str, 1, iDecPt-1);
     If Length(str) > iDecPt Then
     Begin
-      RightPart:= '0.' + Copy(Copy(str, iDecPt + 1, (Length(str) - iDecPt))+ '00000', 1, 5);
-      dNN:= StrToFloat(RightPart)* 10000;
-      RightPart:= IntToStr(Round(dNN));
+      RightPart:= Copy(Copy(str, iDecPt + 1, (Length(str) - iDecPt))+ '00000', 1, 5);
+//      dNN:= StrToFloat(RightPart)* 10000;
+//      RightPart:= IntToStr(Round(dNN));
     End
     Else
     Begin
       RightPart:= '0000';
     End;
-    Result:= LeftPart+'.'+RightPart;
+  End;
+
+  iNN:=Length(LeftPart);
+  if iNN > 6 then
+  Begin
+    Insert(',', LeftPart, iNN - 2);
+    Insert(',', LeftPart, iNN - 5);
   End
   Else
   Begin
-    Result:= str+'.0000';
+    if iNN > 3 then
+     Begin
+       Insert(',', LeftPart, iNN - 2);
+     End;
   End;
-end;
+
+  Result:= LeftPart+'.'+RightPart;
+End;
 
 
-procedure TfInvoice.StorePrices;
+Procedure TfInvoice.CalcPrices;
 Var
   iCol, iRow, iNN: Integer;
+  s1: String;
   dQty, dPrice, dTotal: Double;
-begin
+Begin
   iCol:= 3;
   iRow:= stgInvLine.Row;
   if stgEditQty.Text > '' then
-  begin
+  Begin
     stgInvLine.Cells[iCol, iRow]:= stgEditQty.Text;
   end
   else
-  begin
+  Begin
     stgEditQty.Text:= stgInvLine.Cells[iCol, iRow];
   end;
-  stgEditQty.Text:= fourDecimalPlaces(stgEditQty.Text);
   dQty:= StrToFloat(stgEditQty.Text);
-  iNN:= Length(stgInvLine.Cells[4, iRow]);
-  dPrice:= StrToFloat(Copy(stgInvLine.Cells[4, iRow], 2, iNN-2));
+  stgEditQty.Text:= fourDecimalPlaces(stgEditQty.Text);
+
+  // Format Price
+  s1:= stgInvLine.Cells[4, iRow];
+  s1:= AnsiReplaceStr(s1, '$', '');
+  s1:= MyStripOut(s1);
+//  iNN:= Length(s1);
+//  dPrice:= StrToFloat(Copy(s1, 1, iNN));
+  dPrice:= StrToFloat(s1);
+  s1:= '$' + fourDecimalPlaces(s1);
+  stgInvLine.Cells[4, iRow]:= s1;
+  stgEditPrice.Text:= s1;
+
   dTotal:= (Round(dQty * dPrice * 100)/100);
-  stgEditTotal.Text:= FloatToStrf(dTotal, ffFixed, Length(stgEditTotal.Text)+2, 2);
-  stgInvLine.Cells[5, iRow]:= '$'+stgEditTotal.Text;
+  s1:= '$' + fourDecimalPlaces(FloatToStr(dTotal));
+  iNN:= Length(s1);
+  s1:= copy(s1, 1, iNN - 2);
+  stgEditTotal.Text:= s1;
+  stgInvLine.Cells[5, iRow]:= s1;
   stgInvLine.Refresh;
 End;
 
 
-procedure TfInvoice.stgEditQtyExit(Sender: TObject);
-begin
-  StorePrices;
+Procedure TfInvoice.stgEditQtyExit(Sender: TObject);
+Begin
+  CalcPrices;
 End;
 
 
-procedure TfInvoice.stgEditPriceExit(Sender: TObject);
-begin
+Procedure TfInvoice.stgEditPriceExit(Sender: TObject);
+Begin
   stgInvLine.Cells[4, stgInvLine.Row]:= stgEditPrice.Text;
-  StorePrices;
+  CalcPrices;
 End;
 
-procedure TfInvoice.stgEditTotalExit(Sender: TObject);
+
+Procedure TfInvoice.stgEditTotalExit(Sender: TObject);
 Var
   dPrice, dTotal: Double;
-begin
+  s1: String;
+Begin
   stgInvLine.Cells[5, stgInvLine.Row]:= stgEditTotal.Text;
-  dTotal:= StrToFloat(stgEditTotal.Text);
-  dPrice:= dTotal / (strToFloat(stgInvLine.Cells[5, stgInvLine.Row]));
-  StorePrices;
+  s1:= MyStripOut(stgEditTotal.Text);
+  s1:= AnsiReplaceStr(s1, '$', '');
+  dTotal:= StrToFloat(s1);
+  dPrice:= dTotal / strToFloat(s1);
+  CalcPrices;
+  stgInvLine.Refresh;
+  stgInvLine.SetFocus;
+  PostKeyEx32(VK_DOWN,[], False);    // See Globals
 End;
 
+
+
+Procedure TfInvoice.cbxItemCodeExit(Sender: TObject);
+Begin
+  ItemSelected;
+End;
+
+
+Procedure TfInvoice.cbxItemCodeChange(Sender: TObject);
+Begin
+  ItemSelected;
+End;
+
+
+Procedure TfInvoice.ListBoxShipToEnter(Sender: TObject);
+Begin
+  edtDelivSurname.Visible:= True;
+  edtDelivFirstName.Visible:= True;
+  edtDeliv1.Visible:= True;
+  edtDeliv2.Visible:= True;
+  edtDelivCity.Visible:= True;
+  edtDelivState.Visible:= True;
+  edtDelivPostCode.Visible:= True;
+  lblShipTo1.Visible:= True;
+  lblFirstName.Visible:= True;
+  lblDelivAddress.Visible:= True;
+End;
 
 
 End.

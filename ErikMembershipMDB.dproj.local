@@ -2,9 +2,9 @@
 <BorlandProject>
 	<Transactions>
     <Transaction>2017/01/23 14:06:56.000.983,=C:\Users\Client\Documents\Embarcadero\Studio\Projects\Unit1.pas</Transaction>
-    <Transaction>2017/01/23 14:07:43.000.215,C:\Users\Client\Documents\Embarcadero\Studio\Projects\Unit1.dfm=C:\Develop\Membership\Unit1.dfm</Transaction>
-    <Transaction>2017/01/23 14:07:43.000.215,C:\Users\Client\Documents\Embarcadero\Studio\Projects\Unit1.pas=C:\Develop\Membership\Unit1.pas</Transaction>
-    <Transaction>2017/01/23 14:08:02.000.208,C:\Users\Client\Documents\Embarcadero\Studio\Projects\Project1.dproj=C:\Develop\Membership\ErikMembershipMDB.dproj</Transaction>
+    <Transaction>2017/01/23 14:07:43.000.215,C:\Develop\Membership\Unit1.dfm=C:\Users\Client\Documents\Embarcadero\Studio\Projects\Unit1.dfm</Transaction>
+    <Transaction>2017/01/23 14:07:43.000.215,C:\Develop\Membership\Unit1.pas=C:\Users\Client\Documents\Embarcadero\Studio\Projects\Unit1.pas</Transaction>
+    <Transaction>2017/01/23 14:08:02.000.208,C:\Develop\Membership\ErikMembershipMDB.dproj=C:\Users\Client\Documents\Embarcadero\Studio\Projects\Project1.dproj</Transaction>
     <Transaction>2017/01/23 14:09:50.000.963,=C:\Develop\Membership\fMainU.pas</Transaction>
     <Transaction>2017/01/23 14:10:53.000.259,C:\Develop\Membership\Unit1.pas=</Transaction>
     <Transaction>2017/01/23 14:14:05.000.425,=C:\Develop\Membership\fCardMaintU.pas</Transaction>
@@ -17,8 +17,8 @@
     <Transaction>2017/01/23 15:44:02.000.884,=C:\Develop\Membership\fCardMaintU.pas</Transaction>
     <Transaction>2017/01/23 16:03:05.000.768,=C:\Develop\Membership\dmoCategoryU.pas</Transaction>
     <Transaction>2017/01/23 16:03:12.000.742,=C:\Develop\Membership\fCatMaintU.pas</Transaction>
-    <Transaction>2017/01/23 16:07:58.000.450,=C:\Develop\Membership\fCardCommU.pas</Transaction>
     <Transaction>2017/01/23 16:07:58.000.335,=C:\Develop\Membership\dmoCardComU.pas</Transaction>
+    <Transaction>2017/01/23 16:07:58.000.450,=C:\Develop\Membership\fCardCommU.pas</Transaction>
     <Transaction>2017/01/23 16:15:14.000.374,=C:\Develop\Membership\fReportRangesU.pas</Transaction>
     <Transaction>2017/01/23 16:55:31.000.041,=C:\Develop\Membership\fCardReportU.pas</Transaction>
     <Transaction>2017/01/23 18:07:57.000.926,=C:\Develop\Membership\dmoItemU.pas</Transaction>
@@ -26,8 +26,9 @@
     <Transaction>2017/01/23 18:12:02.000.789,=C:\Develop\Membership\dmoInvoiceU.pas</Transaction>
     <Transaction>2017/01/23 18:12:02.000.874,=C:\Develop\Membership\fInvoiceU.pas</Transaction>
     <Transaction>2017/01/23 18:12:03.000.088,=C:\Develop\Membership\fMemMaintU.pas</Transaction>
-    <Transaction>2017/02/05 16:04:58.151,=C:\Develop\Membership\Unit2.pas</Transaction>
-    <Transaction>2017/02/05 16:05:33.753,C:\Develop\Membership\InvLineClass.pas=C:\Develop\Membership\Unit2.pas</Transaction>
+    <Transaction>2017/02/05 16:04:58.000.151,=C:\Develop\Membership\Unit2.pas</Transaction>
+    <Transaction>2017/02/05 16:05:33.000.753,C:\Develop\Membership\Unit2.pas=C:\Develop\Membership\InvLineClass.pas</Transaction>
+    <Transaction>2017/02/16 13:47:12.000.225,C:\Develop\Membership\InvLineClass.pas=C:\Develop\Membership\InvClass.pas</Transaction>
   </Transactions>
 	<ProjectSortOrder AutoSort="0" SortType="0">
     <File Path="C:\Develop"/>
@@ -63,6 +64,6 @@
     <File Path="fMemMaintU.dfm"/>
     <File Path="fReportRangesU.pas"/>
     <File Path="fReportRangesU.dfm"/>
-    <File Path="InvLineClass.pas"/>
+    <File Path="InvClass.pas"/>
   </ProjectSortOrder>
 </BorlandProject>

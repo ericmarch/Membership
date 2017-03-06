@@ -18,7 +18,7 @@ uses
   dmoInvoiceU in 'dmoInvoiceU.pas' {dmoInvoice: TDataModule},
   fInvoiceU in 'fInvoiceU.pas' {fInvoice},
   fMemMaintU in 'fMemMaintU.pas' {fMemMaint},
-  InvLineClass in 'InvLineClass.pas';
+  InvClass in 'InvClass.pas';
 
 {$R *.res}
 
