@@ -4,6 +4,7 @@ interface
 
 uses
   System.SysUtils,
+  strUtils,
   System.Classes,
   Data.DB,
   Data.Win.ADODB,
@@ -22,10 +23,10 @@ type
     procedure DataModuleCreate(Sender: TObject);
     procedure DataModuleDestroy(Sender: TObject);
     procedure ReOpenDstCustomer;
-    procedure FillInvObj(InvObj: TInvClass);
+    procedure FillInvObj(VAR InvObj: TInvClass);
     procedure RecordInvLine(InvLineObj: TInvLineClass);
     procedure RecordInv(InvObj: TInvClass);
-    procedure FindItem(iID: Integer);
+    procedure RecordInvTotal(InvObj: TInvClass);
     Function  FindItemID(sItemCode: String):Integer;
     Function  CustAddress(LineNo: Integer): String;
     Function  CustShipTo(LineNo: Integer): String;
@@ -46,7 +47,7 @@ implementation
 
 { %CLASSGROUP 'Vcl.Controls.TControl' }
 
-uses dmoConnectionU;
+uses dmoConnectionU, globals;
 
 {$R *.dfm}
 
@@ -89,14 +90,6 @@ Begin
 End;
 
 
-procedure TdmoInvoice.FindItem(iID: Integer);
-begin
-//  dstItem.Active:= False;
-//  dstItem.CommandText:= 'Select * FROM Item where ItemID = ' + IntToStr(iID);
-//  dstItem.Active:= True;
-end;
-
-
 function TdmoInvoice.GetNextInvID: Integer;
 Var
   inn: Integer;
@@ -115,6 +108,7 @@ begin
   End;
 end;
 
+
 procedure TdmoInvoice.ReOpenDstCustomer;
 begin
   dstCustomer.Active := False;
@@ -127,75 +121,88 @@ End;
 procedure TdmoInvoice.RecordInv(InvObj: TInvClass);
 Var
   iNN: Integer;
-  s1, s2: String;
+  aDD, aMM, aYYYY: Word;
+  s1, s2, sDD, sMM, sYYYY: String;
 begin
-//  dstInvoice.Active := False;
-//  dstInvoice.CommandText :=
-//    'Select Top 1 InvID FROM Invoice Order By InvID DESC';
-//  dstInvoice.Active := True;
-//  if dstInvoice.RecordCount < 1 then
-//  Begin
-//    iNN:= 1;
-//  End
-//  Else
-//  Begin
-//    iNN := dstInvoice.FieldByName('InvID').AsInteger + 1;
-//  End;
-//  iCardID:=dstCustomer.FieldByName('Card.CardID').AsInteger;
-//  s1:= 'Insert into Invoice (InvID, ' +
-//        'InvNumber, CardID, ' +
-//        'DelivSurname, DelivFirstname, ' +
-//        'Deliv1, Deliv2, ' +
-//        'DelivCity, DelivState, ' +
-//        'DelivPostCode) VALUES (' +
-//         IntToStr(iNN) + ', ' + IntToStr(0) + ', ' +
-//         IntToStr(iCardID) + ', ';
-//  s2:= dstCustomer.FieldByName('SurName').AsString;
-//  if Length(s2) < 1 then
-//    s2:= ' ';
-//  s1:= s1 + QuotedStr(s2) + ', ';
-//  s2:= dstCustomer.FieldByName('FirstName').AsString;
-//  if Length(s2) < 1 then
-//    s2:= ' ';
-//  s1:= s1 + QuotedStr(s2) + ', ';
-//  s2:= dstCustomer.FieldByName('Deliv1').AsString;
-//  if Length(s2) < 1 then
-//    s2:= ' ';
-//  s1:= s1 + QuotedStr(s2) + ', ';
-//  s2:= dstCustomer.FieldByName('Deliv2').AsString;
-//  if Length(s2) < 1 then
-//    s2:= ' ';
-//  s1:= s1 + QuotedStr(s2) + ', ';
-//  s2:= dstCustomer.FieldByName('DelivCity').AsString;
-//  if Length(s2) < 1 then
-//    s2:= ' ';
-//  s1:= s1 + QuotedStr(s2) + ', ';
-//  s2:= dstCustomer.FieldByName('DelivState').AsString;
-//  if Length(s2) < 1 then
-//    s2:= ' ';
-//  s1:= s1 + QuotedStr(s2) + ', ';
-//  s2:= dstCustomer.FieldByName('DelivPostCode').AsString;
-//  if Length(s2) < 1 then
-//    s2:= ' ';
-//  s1:= s1 + QuotedStr(s2) + ')';
-//  ADOCommand1.CommandText:= s1;
-//  ADOCommand1.Execute;
-
-  s1:= InvObj.InvNumber;
-//  s1:= 'Update Invoice SET [InvNumber] = InvObj. ,
-//    [Freight] = [Freight] * 1.03
-//WHERE [ShipCountryRegion] = 'US''
-//  AdoCommand1.CommandText:= s1;
-//  ADOCommand1.Execute;
+  DecodeDate(InvObj.InvDate, aYYYY, aMM, aDD);
+  sDD:= AnsiRightStr('00' + FloatTostr(aDD), 2);
+  sMM:= AnsiRightStr('00' + FloatTostr(aMM), 2);
+  sYYYY:= FloatToStr(aYYYY);
+  s2:= sMM + '/' + sDD + '/' + sYYYY;
+  s1:= 'Insert into Invoice (InvID, ' +
+        'InvNumber, CardID, ' +
+        'CustPONumber, InvDate, ' +
+        'DelivSurname, DelivFirstname, ' +
+        'Deliv1, Deliv2, ' +
+        'DelivCity, DelivState, ' +
+        'DelivPostCode, InvTotal) '
+        + 'VALUES ('
+        + IntToStr(InvObj.InvID) + ', '
+        + QuotedStr(InvObj.InvNumber) + ', '
+        + IntToStr(InvObj.CardID) + ', '
+        + QuotedStr(InvObj.CustPONumber) + ', '
+        + '#' + s2 + '#' + ', '
+        + QuotedStr(InvObj.DelivSurname) + ', '
+        + QuotedStr(InvObj.DelivFirstName) + ', '
+        + QuotedStr(InvObj.Deliv1) + ', '
+        + QuotedStr(InvObj.Deliv2) + ', '
+        + QuotedStr(InvObj.DelivCity) + ', '
+        + QuotedStr(InvObj.DelivState) + ', '
+        + QuotedStr(InvObj.DelivPostCode) + ', '
+        + FloatToStr(InvObj.InvTotal)
+        + ')';
+  ADOCommand1.CommandText:= s1;
+//  ADOCommand1.Parameters.ParamByName('p1').Value:= InvObj.InvDate;
+  Try
+    ADOCommand1.Execute;
+  Except
+    On E : Exception Do
+    Begin
+      Error('Exception class name = '+E.ClassName);
+      Error('Exception message = '+E.Message);
+    End;
+  End;
+  qryInvoice.Active:= False;
+  qryInvoice.Active:= True;
 end;
 
 
 procedure TdmoInvoice.RecordInvLine(InvLineObj: TInvLineClass);
 Var
-  s1: String;
+  s1, sItemID: String;
 begin
-  s1:= 'Insert into  ';
-  AdoCommand1.CommandText:= 'Insert INTO InvLine (InvID) VALUES (' + IntToStr(InvLineObj.InvID)+ ')';
+  s1:= 'InvID ' + ' = ' + IntToStr(InvLineObj.InvID) + CRLF
+            + 'LineNumber = ' + IntToStr(InvLineObj.LineNumber) + CRLF
+            + IntToStr(InvLineObj.ItemID) +', '
+            + QuotedStr(InvLineObj.ItemCode) +', '
+            + QuotedStr(InvLineObj.Description) +', '
+            + FloatToStr(InvLineObj.Quantity) +', '
+            + FloatToStr(InvLineObj.TaxIncUnitPrice) +', '
+            + FloatToStr(InvLineObj.TaxIncTotal);
+  Information(s1);
+  sItemID:= IntToStr(dstItem.FieldByName('ItemID').AsInteger);
+  s1:= 'Insert INTO InvLine (InvLineID, InvID, LineNumber, ItemID, '
+            + 'Description, Quantity, TaxIncUnitPrice, TaxIncTotal) '
+            + 'VALUES ('
+            + IntToStr(InvLineObj.InvID) +', '
+            + IntToStr(InvLineObj.LineNumber) +', '
+            + IntToStr(InvLineObj.ItemID) +', '
+            + QuotedStr(InvLineObj.ItemCode) +', '
+            + QuotedStr(InvLineObj.Description) +', '
+            + FloatToStr(InvLineObj.Quantity) +', '
+            + FloatToStr(InvLineObj.TaxIncUnitPrice) +', '
+            + FloatToStr(InvLineObj.TaxIncTotal) +', '
+            + ')';
+  AdoCommand1.CommandText:= s1;
+  ADOCommand1.Execute;
+end;
+
+procedure TdmoInvoice.RecordInvTotal(InvObj: TInvClass);
+begin
+  ADOCommand1.CommandText:= 'Update Invoice SET InvTotal = '
+        + FloatToStr(InvObj.InvTotal)
+        + ' WHERE InvID = '
+        + IntToStr(InvObj.InvID);
   ADOCommand1.Execute;
 end;
 
@@ -210,7 +217,7 @@ begin
   sCustOrderBy := ' ORDER BY [SurName] +" " + [FirstName] + " " + [PostCity]';
 End;
 
-procedure TdmoInvoice.FillInvObj(InvObj: TInvClass);
+procedure TdmoInvoice.FillInvObj(VAR InvObj: TInvClass);
 var
   iNN, iCardID: Integer;
   s1, s2 : String;
@@ -263,15 +270,19 @@ var
 begin
   case LineNo of
     1:
-      Begin
-        s1 := dstCustomer.FieldByName('FirstName').AsString;
-        s1 := s1 + ' ' + dstCustomer.FieldByName('SurName').AsString;
-        Result := s1;
-      End;
+      Result:= dstCustomer.FieldByName('SurName').AsString;
     2:
-      Result := dstCustomer.FieldByName('Deliv1').AsString;
+      Result:= dstCustomer.FieldByName('FirstName').AsString;
     3:
+      Result := dstCustomer.FieldByName('Deliv1').AsString;
+    4:
       Result := dstCustomer.FieldByName('Deliv2').AsString;
+    5:
+      Result := dstCustomer.FieldByName('DelivCity').AsString;
+    6:
+      Result := dstCustomer.FieldByName('DelivState').AsString;
+    7:
+      Result := dstCustomer.FieldByName('DelivPostCode').AsString;
   Else
     Begin
       s1 := dstCustomer.FieldByName('DelivCity').AsString + '  ';
