@@ -15,7 +15,7 @@ type
     fInvNumber: String;
     fCardID: Integer;
     fCustPONumber: String;
-    fInvDate: TDateTime;
+    fInvDate: TDate;
     fDelivSurname: String;
     fDelivFirstname: String;
     fDeliv1: String;
@@ -32,7 +32,7 @@ type
     property InvNumber: String Read fInvNumber Write fInvNumber;
     property CardID: Integer Read fCardID write fCardID;
     property CustPONumber: String Read fCustPONumber Write fCustPONumber;
-    property InvDate: TDateTime Read fInvDate Write fInvDate;
+    property InvDate: TDate Read fInvDate Write fInvDate;
     property DelivSurname: String Read fDelivSurname Write fDelivSurname;
     property DelivFirstname: String Read fDelivFirstname Write fDelivFirstname;
     property Deliv1: String Read fDeliv1 Write fDeliv1;

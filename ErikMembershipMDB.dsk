@@ -1,11 +1,11 @@
 ﻿[Closed Files]
-File_0=TSourceModule,'c:\program files (x86)\embarcadero\studio\18.0\SOURCE\VCL\Vcl.Buttons.pas',0,1,1533,1,1551,0,0,,
-File_1=TSourceModule,'c:\program files (x86)\embarcadero\studio\18.0\source\data\ado\Data.Win.ADODB.pas',0,1,3207,1,3225,0,0,,
-File_2=TSourceModule,'c:\program files (x86)\embarcadero\studio\18.0\SOURCE\VCL\Vcl.StdCtrls.pas',0,1,6359,1,6377,0,0,{{1655,4}
-File_3=TSourceModule,'c:\program files (x86)\embarcadero\studio\18.0\SOURCE\VCL\Vcl.Controls.pas',0,1,10868,1,10886,0,0,,
-File_4=TSourceModule,'c:\program files (x86)\embarcadero\studio\18.0\source\rtl\common\System.Classes.pas',0,1,7054,1,7069,0,0,,
-File_5=TSourceModule,'c:\program files (x86)\embarcadero\studio\18.0\source\data\Data.DB.pas',0,1,3250,1,3268,0,0,,
-File_6=TSourceModule,'c:\program files (x86)\embarcadero\studio\18.0\SOURCE\RTL\SYS\System.SysUtils.pas',0,1,5521,1,5538,0,0,,
+File_0=TSourceModule,'c:\program files (x86)\embarcadero\studio\18.0\source\data\ado\Data.Win.ADODB.pas',0,1,3207,1,3225,0,0,,
+File_1=TSourceModule,'c:\program files (x86)\embarcadero\studio\18.0\SOURCE\RTL\SYS\System.SysUtils.pas',0,1,5520,1,5538,0,0,,
+File_2=TSourceModule,'c:\program files (x86)\embarcadero\studio\18.0\SOURCE\VCL\Vcl.Buttons.pas',0,1,1533,1,1551,0,0,,
+File_3=TSourceModule,'c:\program files (x86)\embarcadero\studio\18.0\SOURCE\VCL\Vcl.StdCtrls.pas',0,1,6359,1,6377,0,0,{{1655,4}
+File_4=TSourceModule,'c:\program files (x86)\embarcadero\studio\18.0\SOURCE\VCL\Vcl.Controls.pas',0,1,10868,1,10886,0,0,,
+File_5=TSourceModule,'c:\program files (x86)\embarcadero\studio\18.0\source\rtl\common\System.Classes.pas',0,1,7054,1,7069,0,0,,
+File_6=TSourceModule,'c:\program files (x86)\embarcadero\studio\18.0\source\data\Data.DB.pas',0,1,3250,1,3268,0,0,,
 File_7=TSourceModule,'C:\Develop\Membership\MyGlobals.pas',0,1,1,1,5,0,0,,
 File_8=TSourceModule,'C:\Develop\Membership\fMemMaintU.pas',0,1,120,24,122,0,0,,
 File_9=TSourceModule,'C:\Develop\Membership\dmoMemMaintU.pas',0,1,95,41,173,0,0,,
@@ -14,38 +14,38 @@ File_11=TSourceModule,'C:\Develop\Membership\fCardReportU.pas',0,1,201,28,191,0,
 
 [Modules]
 Module0=C:\Develop\Membership\dmoInvoiceU.pas
-Module1=C:\Develop\Membership\ErikMembershipMDB.dproj
+Module1=C:\Develop\Membership\fInvoiceU.pas
 Module2=C:\Develop\Globals\globals.pas
-Module3=C:\Develop\Membership\fInvoiceU.pas
-Module4=C:\Develop\Membership\MyClassU.pas
+Module3=C:\Develop\Membership\MyClassU.pas
+Module4=C:\Develop\Membership\InvClass.pas
 Module5=default.htm
-Module6=C:\Develop\Membership\fCardCommU.pas
-Module7=C:\Develop\Membership\InvClass.pas
+Module6=C:\Develop\Membership\ErikMembershipMDB.dproj
+Module7=C:\Develop\Membership\fCardCommU.pas
 Count=8
 EditWindowCount=1
 
 [C:\Develop\Membership\dmoInvoiceU.pas]
 ModuleType=TSourceModule
 
-[C:\Develop\Membership\ErikMembershipMDB.dproj]
-ModuleType=TBaseProject
-
-[C:\Develop\Globals\globals.pas]
+[C:\Develop\Membership\fInvoiceU.pas]
 ModuleType=TSourceModule
 
-[C:\Develop\Membership\fInvoiceU.pas]
+[C:\Develop\Globals\globals.pas]
 ModuleType=TSourceModule
 
 [C:\Develop\Membership\MyClassU.pas]
 ModuleType=TSourceModule
 
+[C:\Develop\Membership\InvClass.pas]
+ModuleType=TSourceModule
+
 [default.htm]
 ModuleType=TURLModule
 
-[C:\Develop\Membership\fCardCommU.pas]
-ModuleType=TSourceModule
+[C:\Develop\Membership\ErikMembershipMDB.dproj]
+ModuleType=TBaseProject
 
-[C:\Develop\Membership\InvClass.pas]
+[C:\Develop\Membership\fCardCommU.pas]
 ModuleType=TSourceModule
 
 [EditWindow0]
@@ -75,9 +75,9 @@ ClientHeight=9231
 DockedToMainForm=1
 BorlandEditorCodeExplorer=BorlandEditorCodeExplorer@EditWindow0
 TopPanelSize=0
-LeftPanelSize=1896
+LeftPanelSize=1891
 LeftPanelClients=PropertyInspector,DockSite3
-LeftPanelData=00000800010100000000B91000000000000001680700000000000001000000005C0E000009000000446F636B53697465330100000000BB1D00001100000050726F7065727479496E73706563746F72FFFFFFFF
+LeftPanelData=00000800010100000000B91000000000000001630700000000000001000000005C0E000009000000446F636B53697465330100000000BB1D00001100000050726F7065727479496E73706563746F72FFFFFFFF
 RightPanelSize=2000
 RightPanelClients=DockSite2,DockSite4
 RightPanelData=00000800010100000000B91000000000000001D00700000000000001000000004412000009000000446F636B53697465320100000000BB1D000009000000446F636B5369746534FFFFFFFF
@@ -95,9 +95,9 @@ WelcomePageURL=bds:/default.htm
 [View1]
 CustomEditViewType=TEditView
 Module=C:\Develop\Membership\fInvoiceU.pas
-CursorX=18
-CursorY=345
-TopLine=330
+CursorX=1
+CursorY=326
+TopLine=311
 LeftCol=1
 Elisions=
 Bookmarks={0,236,4}
@@ -107,11 +107,11 @@ EditViewName=C:\Develop\Membership\fInvoiceU.pas
 CustomEditViewType=TEditView
 Module=C:\Develop\Membership\dmoInvoiceU.pas
 CursorX=1
-CursorY=174
-TopLine=158
+CursorY=212
+TopLine=197
 LeftCol=1
 Elisions=
-Bookmarks={0,125,1}
+Bookmarks={0,127,1}
 EditViewName=C:\Develop\Membership\dmoInvoiceU.pas
 
 [View3]
@@ -128,9 +128,9 @@ EditViewName=C:\Develop\Membership\ErikMembershipMDB.dpr
 [View4]
 CustomEditViewType=TEditView
 Module=C:\Develop\Globals\globals.pas
-CursorX=12
-CursorY=279
-TopLine=249
+CursorX=38
+CursorY=313
+TopLine=294
 LeftCol=1
 Elisions=
 Bookmarks=
@@ -152,7 +152,7 @@ CustomEditViewType=TEditView
 Module=C:\Develop\Membership\MyClassU.pas
 CursorX=1
 CursorY=1
-TopLine=25
+TopLine=7
 LeftCol=1
 Elisions=
 Bookmarks=
@@ -161,9 +161,9 @@ EditViewName=C:\Develop\Membership\MyClassU.pas
 [View7]
 CustomEditViewType=TEditView
 Module=C:\Develop\Membership\InvClass.pas
-CursorX=22
-CursorY=43
-TopLine=1
+CursorX=5
+CursorY=48
+TopLine=37
 LeftCol=1
 Elisions=
 Bookmarks=
@@ -197,12 +197,7 @@ Dockable=1
 StayOnTop=0
 
 [Breakpoints]
-Count=5
-Breakpoint0='C:\Develop\Membership\dmoInvoiceU.pas',196,'',0,1,'',1,0,0,'',1,'','','',0,''
-Breakpoint1='Vcl.Buttons.pas',1551,'',0,1,'',1,0,0,'',1,'','','',0,''
-Breakpoint2='C:\Develop\Membership\fInvoiceU.pas',347,'',0,1,'',1,0,0,'',1,'','','',0,''
-Breakpoint3='C:\Develop\Membership\dmoInvoiceU.pas',132,'',0,1,'',1,0,0,'',1,'','','',0,''
-Breakpoint4='C:\Develop\Membership\dmoInvoiceU.pas',174,'',0,1,'',1,0,0,'',1,'','','',0,''
+Count=0
 
 [EmbarcaderoWin32Debugger_AddressBreakpoints]
 Count=0
@@ -219,13 +214,13 @@ Create=1
 Visible=1
 Docked=0
 State=2
-Left=5
+Left=0
 Top=9
-Width=7104
+Width=4000
 Height=7093
 MaxLeft=-5
 MaxTop=-9
-MaxWidth=7104
+MaxWidth=4000
 MaxHeight=7093
 ClientWidth=10000
 ClientHeight=9787
@@ -393,17 +388,22 @@ Docked=1
 State=0
 Left=0
 Top=415
-Width=1896
+Width=1891
 Height=3769
 MaxLeft=-1
 MaxTop=-1
-ClientWidth=1896
+ClientWidth=1891
 ClientHeight=3769
 TBDockHeight=9009
-LRDockWidth=1896
+LRDockWidth=1891
 Dockable=1
 StayOnTop=0
 SplitPos=111
+
+[PropInspDesignerSelection]
+ArrangeBy=Name
+SelectedItem=Text,OnChange
+ExpandedItems=StyleElements=0,LiveBindings=0,Anchors=0,BevelEdges=0,Constraints=0,Font=0,"LiveBindings Designer=0",Margins=0,Touch=0,CalColors=0,ListSource=0,Connection=0,ExecuteOptions=0
 
 [frmDesignPreview]
 PercentageSizes=1
@@ -701,11 +701,11 @@ Docked=1
 State=0
 Left=0
 Top=0
-Width=1896
+Width=1891
 Height=3472
 MaxLeft=-1
 MaxTop=-1
-ClientWidth=1896
+ClientWidth=1891
 ClientHeight=3472
 TBDockHeight=3676
 LRDockWidth=1896
@@ -835,14 +835,14 @@ Docked=1
 State=0
 Left=0
 Top=18
-Width=1896
+Width=1891
 Height=3472
 MaxLeft=-1
 MaxTop=-1
-ClientWidth=1896
+ClientWidth=1891
 ClientHeight=3472
 TBDockHeight=9009
-LRDockWidth=1896
+LRDockWidth=1891
 Dockable=1
 StayOnTop=0
 TabPosition=1

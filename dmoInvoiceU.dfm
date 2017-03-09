@@ -47,8 +47,8 @@ object dmoInvoice: TdmoInvoice
     Connection = dmoConnection.conMembership
     CommandText = 'Select ItemID, ItemCode, IsInactive, Description FROM Item'
     Parameters = <>
-    Left = 320
-    Top = 144
+    Left = 416
+    Top = 136
   end
   object qryInvLineTMP: TADOQuery
     Connection = dmoConnection.conMembership
@@ -63,5 +63,13 @@ object dmoInvoice: TdmoInvoice
     Parameters = <>
     Left = 72
     Top = 232
+  end
+  object dstInvLine: TADODataSet
+    Connection = dmoConnection.conMembership
+    CursorType = ctStatic
+    CommandText = 'Select * FROM InvLine'
+    Parameters = <>
+    Left = 320
+    Top = 144
   end
 end

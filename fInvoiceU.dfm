@@ -169,8 +169,8 @@ object fInvoice: TfInvoice
     Top = 28
     Width = 78
     Height = 21
-    Date = 42761.871474814810000000
-    Time = 42761.871474814810000000
+    Date = 0.871474814812245400
+    Time = 0.871474814812245400
     TabOrder = 4
   end
   object Panel1: TPanel
@@ -213,6 +213,7 @@ object fInvoice: TfInvoice
       Height = 21
       TabOrder = 1
       Text = 'cbxItemCode'
+      Visible = False
       OnChange = cbxItemCodeChange
       OnExit = cbxItemCodeExit
     end

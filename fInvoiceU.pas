@@ -123,16 +123,30 @@ Begin
   End;
   ListBoxAddress.Items[iNN]:= dmoInvoice.CustAddress(4);
 
-  ListBoxShipTo.Items[0]:= dmoInvoice.CustShipTo(1);
-  ListBoxShipTo.Items[1]:= dmoInvoice.CustShipTo(2);
-  iNN:= 2;
-  s1:= dmoInvoice.CustShipTo(3);
+  edtDelivSurname.Text:= dmoInvoice.CustShipTo(1);
+  edtDelivFirstName.Text:= dmoInvoice.CustShipTo(2);
+  edtDeliv1.Text:= dmoInvoice.CustShipTo(3);
+  s1:= dmoInvoice.CustShipTo(4);
   if s1 > '' then
   Begin
-    ListBoxShipTo.Items[iNN]:= s1;
+    edtDeliv2.Text:= s1;
+  End;
+  edtDelivCity.Text:= dmoInvoice.CustShipTo(5);
+  edtDelivState.Text:= dmoInvoice.CustShipTo(6);
+  edtDelivPostCode.Text:= dmoInvoice.CustShipTo(7);
+
+  ListBoxShipTo.Items[0]:= edtDelivFirstName.Text + ' ' + edtDelivSurname.Text;
+  ListBoxShipTo.Items[1]:= edtDeliv1.Text;
+  iNN:= 2;
+  if edtDeliv2.Text > '' then
+  Begin
+    ListBoxShipTo.Items[iNN]:= edtDeliv2.Text;
     iNN:= iNN + 1;
   End;
-  ListBoxShipTo.Items[iNN]:= dmoInvoice.CustShipTo(4);
+  ListBoxShipTo.Items[iNN]:= edtDelivCity.Text + '    '
+        + edtDelivState.Text + '    '
+        + edtDelivPostCode.Text;
+;
 End;
 
 
@@ -253,6 +267,7 @@ Begin
   ItemPickList;  // Create Item Lists.  Refresh available items in case there has been a change
   dmoInvoice.ReOpenDstCustomer;
   dblucbCustomer.KeyValue:= dmoInvoice.dstCustomer.FieldByName('Card.CardID').AsInteger;
+  DateTimePicker1.Date:= date;
   dblucbCustomer.SetFocus;
   spdBtnInvRecord.Enabled:= False;
 End;
@@ -295,14 +310,19 @@ End;
 
 Procedure TfInvoice.LoadInvLine(iLineNumber: Integer);
 var
+  iRow: Integer;
   s1: String;
 Begin
+  iRow:= stgInvLine.Row;
   InvLineObj.InvID:= InvObj.InvID;
   InvLineObj.LineNumber:= iLineNumber;
-  s1:= stgInvLine.Cells[stgInvLine.Row, 1];
-  InvLineObj.ItemID := dmoInvoice.FindItemID(s1);
-  InvLineObj.LineNumber:= iLineNumber;
-  InvLineObj.LineNumber:= iLineNumber;
+  s1:= stgInvLine.Cells[1, iRow];
+  InvLineObj.ItemCode:= s1;
+  InvLineObj.ItemID:= dmoInvoice.FindItemID(s1);
+  InvLineObj.Description:= stgInvLine.Cells[2, iRow];
+  InvLineObj.Quantity:= StrToFloat(AnsiReplaceStr(MyStripout(stgInvLine.Cells[3, iRow]),'$', ''));
+  InvLineObj.TaxIncUnitPrice:= StrToFloat(AnsiReplaceStr(MyStripout(stgInvLine.Cells[4, iRow]), '$', ''));
+  InvLineObj.TaxIncTotal:= StrToFloat(AnsiReplaceStr(MyStripout(stgInvLine.Cells[5, iRow]), '$', ''));
 End;
 
 
@@ -310,9 +330,11 @@ Procedure TfInvoice.spdBtnInvRecordClick(Sender: TObject);
 Var
   iNN: Integer;
 Begin
-  ShowMessage('InvID = ' + IntToStr(InvObj.InvID) + CRLF
-        + 'InvNumber = ' + InvObj.InvNumber + CRLF + 'InvDate = ' + DateToStr(InvObj.InvDate));
-
+  InvObj.InvID:= dmoInvoice.GetNextInvID;
+  InvObj.InvNumber:= IntToStr(InvObj.InvID);
+  InvObj.CardID:= dblucbCustomer.KeyValue;
+  InvObj.CustPONumber:= 'N/A';
+  InvObj.InvDate:= DateTimePicker1.Date;
   InvObj.DelivSurname:= edtDelivSurname.Text;      // In Case delivery details have been changed
   InvObj.DelivFirstName:= edtDelivFirstName.Text;
   InvObj.Deliv1:= edtDeliv1.Text;
@@ -320,19 +342,20 @@ Begin
   InvObj.DelivCity:= edtDelivCity.Text;
   InvObj.DelivState:= edtDelivState.Text;
   InvObj.DelivPostCode:= edtDelivPostCode.Text;
+  InvObj.InvTotal:= 0.00;
+
 
   dmoInvoice.RecordInv(InvObj);
   InvObj.Recorded:= True;
   if stgInvLine.RowCount > 2 then
   Begin
-    for iNN  := 1 to stgInvLine.RowCount do        // Row 0 is column headings
+    for iNN  := 1 to stgInvLine.RowCount -1 do        // Row 0 is column headings
     Begin
       LoadInvLine(iNN);
       dmoInvoice.RecordInvLine(InvLineObj);
+      InvObj.InvTotal:= InvObj.InvTotal + InvLineObj.TaxIncTotal;
     End;
   End;
-  if stgInvLine.RowCount = 2 then
-    dmoInvoice.RecordInvLine(InvLineObj);
 
   HideStgDataBoxes(True);
   spdBtnInvRecord.Enabled:= False;
@@ -344,12 +367,16 @@ Procedure TfInvoice.stgInvLineSelectCell(Sender: TObject; ACol, ARow: Integer;
 Var
   R: TRect;
 Begin
+  ACol:= 1;  // select column 1 no matter what the user selected
+  if aRow < stgInvLine.RowCount -1 then
+    aRow:= stgInvLine.RowCount;
   if ((StrToIntDef(stgInvLine.Cells[0, aRow], 0) < 1) AND (ARow <> 0)) then
   Begin
-    if aRow > 1 then
-    Begin
-      dmoInvoice.RecordInvLine(InvLineObj);
-    End;
+//    if aRow > 1 then
+//    Begin
+//      LoadInvLine(aRow - 1);
+//      dmoInvoice.RecordInvLine(InvLineObj);
+//    End;
     stgInvLine.Cells[0, aRow]:= IntToStr(ARow);  // Put InvLineNumber in Column 0
   End;
   if ((ACol = 1) AND (ARow <> 0)) then

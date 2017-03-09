@@ -20,6 +20,7 @@ type
     dstItem: TADODataSet;
     qryInvLineTMP: TADOQuery;
     ADOCommand1: TADOCommand;
+    dstInvLine: TADODataSet;
     procedure DataModuleCreate(Sender: TObject);
     procedure DataModuleDestroy(Sender: TObject);
     procedure ReOpenDstCustomer;
@@ -36,6 +37,7 @@ type
     sCustCommand: String;
     sCustOrderBy: String;
     procedure SetDstCustCommand;
+    Function  GetNextInvLineID:Integer;
   public
     { Public declarations }
   End;
@@ -167,35 +169,51 @@ begin
 end;
 
 
+function TdmoInvoice.GetNextInvLineID: Integer;
+begin
+  dstInvLine.Active:= False;
+  dstInvLine.CommandText:= 'Select Top 1 InvLineID FROM InvLine Order by InvLineID DESC';
+  dstInvLine.Active:= True;
+  if dstInvLine.RecordCount = 0 then
+    Result:= 1
+  Else
+    Result:= dstInvLine.FieldByName('InvLineID').AsInteger + 1;
+end;
+
+
 procedure TdmoInvoice.RecordInvLine(InvLineObj: TInvLineClass);
 Var
+  iInvLineID: Integer;
   s1, sItemID: String;
 begin
-  s1:= 'InvID ' + ' = ' + IntToStr(InvLineObj.InvID) + CRLF
+  iInvLineID:= GetNextInvLineID;
+  s1:= 'InvLineID = ' + IntToStr(iInvLineID) + CRLF
+            + 'InvID = ' + IntToStr(InvLineObj.InvID) + CRLF
             + 'LineNumber = ' + IntToStr(InvLineObj.LineNumber) + CRLF
-            + IntToStr(InvLineObj.ItemID) +', '
-            + QuotedStr(InvLineObj.ItemCode) +', '
-            + QuotedStr(InvLineObj.Description) +', '
-            + FloatToStr(InvLineObj.Quantity) +', '
-            + FloatToStr(InvLineObj.TaxIncUnitPrice) +', '
-            + FloatToStr(InvLineObj.TaxIncTotal);
+            + 'ItemID = ' + IntToStr(InvLineObj.ItemID) + CRLF
+            + 'Item Code = ' + QuotedStr(InvLineObj.ItemCode) + CRLF
+            + 'Description = ' + QuotedStr(InvLineObj.Description) + CRLF
+            + 'Quantity = ' + FloatToStr(InvLineObj.Quantity) + CRLF
+            + 'Unit Price = ' + FloatToStr(InvLineObj.TaxIncUnitPrice) + CRLF
+            + 'Line Total Inc GST = ' + FloatToStr(InvLineObj.TaxIncTotal);
   Information(s1);
   sItemID:= IntToStr(dstItem.FieldByName('ItemID').AsInteger);
-  s1:= 'Insert INTO InvLine (InvLineID, InvID, LineNumber, ItemID, '
+   s1:= 'Insert INTO InvLine (InvLineID, InvID, LineNumber, ItemID, '
             + 'Description, Quantity, TaxIncUnitPrice, TaxIncTotal) '
             + 'VALUES ('
+            + IntToStr(iInvLineID) +', '
             + IntToStr(InvLineObj.InvID) +', '
             + IntToStr(InvLineObj.LineNumber) +', '
             + IntToStr(InvLineObj.ItemID) +', '
-            + QuotedStr(InvLineObj.ItemCode) +', '
             + QuotedStr(InvLineObj.Description) +', '
             + FloatToStr(InvLineObj.Quantity) +', '
             + FloatToStr(InvLineObj.TaxIncUnitPrice) +', '
-            + FloatToStr(InvLineObj.TaxIncTotal) +', '
-            + ')';
+            + FloatToStr(InvLineObj.TaxIncTotal) + ')';
   AdoCommand1.CommandText:= s1;
   ADOCommand1.Execute;
-end;
+  qryInvLine.Active:= False;
+  qryInvLine.Active:= True;
+End;
 
 procedure TdmoInvoice.RecordInvTotal(InvObj: TInvClass);
 begin
