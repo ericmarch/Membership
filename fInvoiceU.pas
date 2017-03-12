@@ -64,7 +64,7 @@ type
     Procedure dblucbCustomerExit(Sender: TObject);
     Procedure stgInvLineSelectCell(Sender: TObject; ACol, ARow: Integer;
       var CanSelect: Boolean);
-    Procedure cbxItemCodeChange(Sender: TObject);
+    procedure cbxItemCodeEnter(Sender: TObject);
     Procedure cbxItemCodeExit(Sender: TObject);
     Procedure spdBtnInvRecordClick(Sender: TObject);
     Procedure stgEditDescriptionChange(Sender: TObject);
@@ -78,14 +78,14 @@ type
     { Private declarations }
     InvLineObj: TInvLineClass;
     InvObj: TinvClass;
-    sListID, sListCode, sListDescription: tStringList;
+    iRow: Integer;
     Procedure FormReset;
     Procedure StrGridHeadings;
     Procedure HideStgDataBoxes(TF: Boolean);
     Procedure ItemPickList;
     Procedure ItemSelected;
     Procedure CalcPrices;
-    Procedure LoadInvLine(iLineNumber: Integer);
+    Procedure LoadInvLine;
     Function  fourDecimalPlaces(str: String):String;
     Function  ItemInList(sItemCode: String):Boolean;
   public
@@ -111,6 +111,7 @@ Var
   iNN: Integer;
   s1: String;
 Begin
+  stgInvLine.Enabled:= True;
   dmoInvoice.FillInvObj(InvObj);
   ListBoxAddress.Items[0]:= dmoInvoice.CustAddress(1);
   ListBoxAddress.Items[1]:= dmoInvoice.CustAddress(2);
@@ -169,39 +170,23 @@ End;
 
 
 Procedure TfInvoice.ItemPickList;
+  //----------- Add ItemCode to ComboBoxItemCode ----------
 Var
   iNN: Integer;
-  s1, s2, s3, sComboBoxText: String;
+  s1: String;
 Begin
-  //-------------- Fill Item StringLists ------------------
-  sListID:= tStringList.Create;
-  sListCode:= tStringList.Create;
-  sListDescription:= tStringList.Create;
   iNN:= 1;
-//  cbxItemCode.Visible:= False;
+  dmoInvoice.SelectItems;
   dmoInvoice.dstItem.First;
   while NOT dmoInvoice.dstItem.EOF do
   Begin
-    s1:= IntToStr(dmoInvoice.dstItem.FieldByName('ItemID').AsInteger);
-    s2:= dmoInvoice.dstItem.FieldByName('ItemCode').AsString;
-    s3:= dmoInvoice.dstItem.FieldByName('Description').AsString;
-    if dmoInvoice.dstItem.FieldByName('IsInactive').AsBoolean = False Then
-    Begin
-      sListID.Add(s1);
-      sListCode.Add(s2);
-      sListDescription.Add(s3);
-  //----------- Add ItemCode to ComboBoxItemCode ----------
-      if NOT ItemInList(s2) then
-      Begin
-        cbxItemCode.Items.Add(s2);
-        if iNN = 1 then
-          cbxItemCode.Text:= s2;
-        iNN:= iNN + 1;
-      End;
-    End;
+    s1:= dmoInvoice.dstItem.FieldByName('ItemCode').AsString;
+    cbxItemCode.Items.Add(s1);
+    if iNN = 1 then
+      cbxItemCode.Text:= s1;
+    iNN:= iNN + 1;
     dmoInvoice.dstItem.Next;
   End;
-  dmoInvoice.dstItem.First;
 End;
 
 
@@ -236,9 +221,6 @@ Begin
   iNN:= dmoInvoice.GetNextInvID;
   InvObj:= TInvClass.Create(iNN);  // This invid will be replaced with latest invid when invoice is recorded
   InvLineObj:= TInvLineClass.Create(iNN);
-  sListID:= tStringList.Create;
-  sListCode:= tStringList.Create;
-  sListDescription:= tStringList.Create;
   StrGridHeadings;
   ItemPickList;
 End;
@@ -253,18 +235,11 @@ Begin
   // Free Objects and StringLists
   FreeAndNil(dmoInvoice);
   InvLineObj.Destroy;
-  sListID.Destroy;
-  sListCode.Destroy;
-  sListDescription.Destroy;
 End;
 
 
 Procedure TfInvoice.FormReset;
 Begin
-  sListID.Destroy;  // Clear Item Lists
-  sListCode.Destroy;
-  sListDescription.Destroy;
-  ItemPickList;  // Create Item Lists.  Refresh available items in case there has been a change
   dmoInvoice.ReOpenDstCustomer;
   dblucbCustomer.KeyValue:= dmoInvoice.dstCustomer.FieldByName('Card.CardID').AsInteger;
   DateTimePicker1.Date:= date;
@@ -300,29 +275,34 @@ End;
 
 Procedure TfInvoice.spdBtnInvExitClick(Sender: TObject);
 Begin
-  If (InvObj.Recorded = False) AND (spdBtnInvRecord.Enabled = True) Then
-  Begin
-    //  Save the new invoice if respose is OK
-  End;
   Close;
 End;
 
 
-Procedure TfInvoice.LoadInvLine(iLineNumber: Integer);
+Procedure TfInvoice.LoadInvLine;
 var
-  iRow: Integer;
-  s1: String;
+  d1, d2, d3: Double;
 Begin
-  iRow:= stgInvLine.Row;
-  InvLineObj.InvID:= InvObj.InvID;
-  InvLineObj.LineNumber:= iLineNumber;
-  s1:= stgInvLine.Cells[1, iRow];
-  InvLineObj.ItemCode:= s1;
-  InvLineObj.ItemID:= dmoInvoice.FindItemID(s1);
-  InvLineObj.Description:= stgInvLine.Cells[2, iRow];
-  InvLineObj.Quantity:= StrToFloat(AnsiReplaceStr(MyStripout(stgInvLine.Cells[3, iRow]),'$', ''));
-  InvLineObj.TaxIncUnitPrice:= StrToFloat(AnsiReplaceStr(MyStripout(stgInvLine.Cells[4, iRow]), '$', ''));
-  InvLineObj.TaxIncTotal:= StrToFloat(AnsiReplaceStr(MyStripout(stgInvLine.Cells[5, iRow]), '$', ''));
+  d1:= StrToFloatDEF(AnsiReplaceStr(MyStripout(stgEditQty.Text),'$', ''), 0);
+  if (d1 > 0) then
+  Begin
+    stgInvLine.Cells[3, iRow]:= stgEditQty.Text;
+    d2:= StrToFloatDEF(AnsiReplaceStr(MyStripout(stgEditPrice.Text), '$', ''), 0);
+    stgInvLine.Cells[4, iRow]:= stgEditPrice.Text;
+    d3:= StrToFloatDEF(AnsiReplaceStr(MyStripout(stgEditTotal.Text), '$', ''), 0);
+    stgInvLine.Cells[5, iRow]:= stgEditTotal.Text;
+    stgInvLine.Row:= iRow;
+    InvLineObj.InvID:= InvObj.InvID;
+    InvLineObj.LineNumber:= iRow;
+    InvLineObj.ItemCode:= cbxItemCode.Text;
+    stgInvLine.Cells[1, iRow]:= stgEditTotal.Text;
+    InvLineObj.ItemID:= dmoInvoice.FindItemID(InvLineObj.ItemCode);
+    InvLineObj.Description:= stgEditDescription.Text;
+    stgInvLine.Cells[2, iRow]:= stgEditDescription.Text;
+    InvLineObj.Quantity:= d1;
+    InvLineObj.TaxIncUnitPrice:= d2;
+    InvLineObj.TaxIncTotal:= d3;
+  End;
 End;
 
 
@@ -347,17 +327,17 @@ Begin
 
   dmoInvoice.RecordInv(InvObj);
   InvObj.Recorded:= True;
-  if stgInvLine.RowCount > 2 then
+  for iNN  := 1 to iRow do
   Begin
-    for iNN  := 1 to stgInvLine.RowCount -1 do        // Row 0 is column headings
+    If AnsiReplaceStr(MyStripout(stgInvLine.Cells[3, iRow]),'$', '') <> '0.00' Then
     Begin
-      LoadInvLine(iNN);
+      LoadInvLine;
       dmoInvoice.RecordInvLine(InvLineObj);
       InvObj.InvTotal:= InvObj.InvTotal + InvLineObj.TaxIncTotal;
     End;
   End;
-
   HideStgDataBoxes(True);
+  FormReset;
   spdBtnInvRecord.Enabled:= False;
 end;
 
@@ -367,31 +347,14 @@ Procedure TfInvoice.stgInvLineSelectCell(Sender: TObject; ACol, ARow: Integer;
 Var
   R: TRect;
 Begin
-  ACol:= 1;  // select column 1 no matter what the user selected
-  if aRow < stgInvLine.RowCount -1 then
-    aRow:= stgInvLine.RowCount;
-  if ((StrToIntDef(stgInvLine.Cells[0, aRow], 0) < 1) AND (ARow <> 0)) then
+  if (stgInvLine.Cells[0, aRow] < '1') then
   Begin
-//    if aRow > 1 then
-//    Begin
-//      LoadInvLine(aRow - 1);
-//      dmoInvoice.RecordInvLine(InvLineObj);
-//    End;
-    stgInvLine.Cells[0, aRow]:= IntToStr(ARow);  // Put InvLineNumber in Column 0
-  End;
-  if ((ACol = 1) AND (ARow <> 0)) then
-  Begin
-    stgEditDescription.Text:= '';
-    stgInvLine.Cells[2, aRow]:= '';
-    stgEditQty.Text:= '1.0000';
-    stgInvLine.Cells[3, aRow]:= '1.0000';
-    stgEditPrice.Text:= '1.0000';
-    stgInvLine.Cells[4, aRow]:= '1.0000';
-    stgEditTotal.Text:= '1.0000';
-    stgInvLine.Cells[5, aRow]:= '1.0000';
+    iRow:= ARow;
     {Width and position ComboBox should correspond
     To cell StringGrid}
-    R:= stgInvLine.CellRect (ACol, ARow);
+
+      {Place Drop Down Box on Item Code cell}
+    R:= stgInvLine.CellRect (1, ARow);
     R.Left:= R.Left + stgInvLine.Left;
     R.Right:= R.Right + stgInvLine.Left;
     R.Top:= R.Top + stgInvLine.Top;
@@ -452,6 +415,7 @@ Begin
     cbxItemCode.SetFocus;
   End;
   CanSelect:= True;
+  stgInvLine.Enabled:= False;
 
   If edtDelivSurname.Visible = True Then
   Begin
@@ -471,45 +435,36 @@ End;
 
 Procedure TfInvoice.ItemSelected;
 Var
-  iCol, iRow, iRowCount, iItemID: Integer;
+  iCol, iItemID: Integer;
   aQty: Double;
   aSell, aItemTotal: Currency;
 Begin
   if spdBtnInvRecord.Enabled = False then
     spdBtnInvRecord.Enabled:= True;
-  iCol:= stgInvLine.Col;
-  iRow:= stgInvLine.Row;
-  iRowCount:= stgInvLine.RowCount;
-  if cbxItemCode.ItemIndex < 0 then
-    cbxItemCode.ItemIndex:= 0;
   iItemID:= dmoInvoice.FindItemID(cbxItemCode.Text);
-//  stgInvLine.Cells[iCol, iRow]:= ComboBox1.Items[ComboBox1.ItemIndex];
-  stgInvLine.Cells[iCol, iRow]:= cbxItemCode.Text;
-//  cbxItemCode.Visible:= False;
-  stgInvLine.Cells[2, iRow]:= sListDescription[cbxItemCode.ItemIndex];
-  stgEditDescription.Text:= sListDescription[cbxItemCode.ItemIndex];
-  stgInvLine.Cells[3, iRow]:= '1.0000';
-  aQty:= StrToFloat(stgInvLine.Cells[3, iRow]);
-  stgEditQty.Text:= stgInvLine.Cells[3, iRow];
   aSell:= dmoInvoice.dstItem.FieldByName('SellCost').AsCurrency;
-  stgInvLine.Cells[4, iRow]:= FloatToStrF(aSell, ffCurrency, 8, 4);
+
+  stgEditDescription.Text:= dmoInvoice.dstItem.FieldByName('Description').AsString;
+  aQty:= StrToFloatDEF(stgEditQty.Text, 0);
   stgEditPrice.Text:= FloatToStrF(aSell, ffCurrency, 8, 4);
   aItemTotal:= Round((aQty*aSell*100))/100;
-  stgInvLine.Cells[5, iRow]:= FloatToStrF(aItemTotal, ffCurrency, 10, 2);
   stgEditTotal.Text:= FloatToStrF(aItemTotal, ffCurrency, 10, 2);
-  stgInvLine.SetFocus;
-  If (stgInvLine.Cells[1, (stgInvLine.RowCount -1)] > ' ') Then
-    stgInvLine.RowCount:= stgInvLine.RowCount + 1;
-//  ShowMessage('Line 287');
+
+  iCol:= 1;             // ItemCode
+  stgInvLine.Cells[iCol, iRow]:= cbxItemCode.Text;
+  iCol:= 2;             // Item Description
+  stgInvLine.Cells[iCol, iRow]:= stgEditDescription.Text;
+  iCol:= 3;             // Item Qty
+  stgInvLine.Cells[iCol, iRow]:= stgEditQty.Text;
+  iCol:= 4;             // Item Price
+  stgInvLine.Cells[iCol, iRow]:= FloatToStrF(aSell, ffCurrency, 8, 4);
+  iCol:= 5;             // Item Totoal Cost
+  stgInvLine.Cells[iCol, iRow]:= FloatToStrF(aItemTotal, ffCurrency, 10, 2);
 End;
 
 
 Procedure TfInvoice.stgEditDescriptionChange(Sender: TObject);
-Var
-  iCol, iRow: Integer;
 Begin
-  iCol:= stgInvLine.Col;
-  iRow:= stgInvLine.Row;
   if stgEditDescription.Text > '' then
     stgInvLine.Cells[2, iRow]:= stgEditDescription.Text
   else
@@ -548,8 +503,6 @@ Begin
     If Length(str) > iDecPt Then
     Begin
       RightPart:= Copy(Copy(str, iDecPt + 1, (Length(str) - iDecPt))+ '00000', 1, 5);
-//      dNN:= StrToFloat(RightPart)* 10000;
-//      RightPart:= IntToStr(Round(dNN));
     End
     Else
     Begin
@@ -577,46 +530,41 @@ End;
 
 Procedure TfInvoice.CalcPrices;
 Var
-  iCol, iRow, iNN: Integer;
+  iCol, iNN: Integer;
   s1: String;
   dQty, dPrice, dTotal: Double;
 Begin
-  iCol:= 3;
-  iRow:= stgInvLine.Row;
-  if stgEditQty.Text > '' then
+  dQty:= StrToFloatDEF(stgEditQty.Text, 0);
+  if dQty > 0 then
   Begin
+    iCol:= 3;
     stgInvLine.Cells[iCol, iRow]:= stgEditQty.Text;
-  end
-  else
-  Begin
-    stgEditQty.Text:= stgInvLine.Cells[iCol, iRow];
-  end;
-  dQty:= StrToFloat(stgEditQty.Text);
-  stgEditQty.Text:= fourDecimalPlaces(stgEditQty.Text);
+    dQty:= StrToFloat(stgEditQty.Text);
+    stgEditQty.Text:= fourDecimalPlaces(stgEditQty.Text);
 
-  // Format Price
-  s1:= stgInvLine.Cells[4, iRow];
-  s1:= AnsiReplaceStr(s1, '$', '');
-  s1:= MyStripOut(s1);
-//  iNN:= Length(s1);
-//  dPrice:= StrToFloat(Copy(s1, 1, iNN));
-  dPrice:= StrToFloat(s1);
-  s1:= '$' + fourDecimalPlaces(s1);
-  stgInvLine.Cells[4, iRow]:= s1;
-  stgEditPrice.Text:= s1;
+    // Format Price
+    s1:= stgInvLine.Cells[4, iRow];
+    s1:= AnsiReplaceStr(s1, '$', '');
+    s1:= MyStripOut(s1);
+    dPrice:= StrToFloatDEF(s1, 0);
+    s1:= '$' + fourDecimalPlaces(s1);
+    stgInvLine.Cells[4, iRow]:= s1;
+    stgEditPrice.Text:= s1;
 
-  dTotal:= (Round(dQty * dPrice * 100)/100);
-  s1:= '$' + fourDecimalPlaces(FloatToStr(dTotal));
-  iNN:= Length(s1);
-  s1:= copy(s1, 1, iNN - 2);
-  stgEditTotal.Text:= s1;
-  stgInvLine.Cells[5, iRow]:= s1;
-  stgInvLine.Refresh;
+    dTotal:= (Round(dQty * dPrice * 100)/100);
+    s1:= '$' + fourDecimalPlaces(FloatToStr(dTotal));
+    iNN:= Length(s1);
+    s1:= copy(s1, 1, iNN - 2);
+    stgEditTotal.Text:= s1;
+    stgInvLine.Cells[5, iRow]:= s1;
+    stgInvLine.Refresh;
+  End;
 End;
 
 
 Procedure TfInvoice.stgEditQtyExit(Sender: TObject);
 Begin
+  stgInvLine.Cells[3, stgInvLine.Row]:= stgEditQty.Text;
   CalcPrices;
 End;
 
@@ -633,27 +581,32 @@ Var
   dPrice, dTotal: Double;
   s1: String;
 Begin
-  stgInvLine.Cells[5, stgInvLine.Row]:= stgEditTotal.Text;
+  stgInvLine.Cells[5, iRow]:= stgEditTotal.Text;
   s1:= MyStripOut(stgEditTotal.Text);
   s1:= AnsiReplaceStr(s1, '$', '');
   dTotal:= StrToFloat(s1);
   dPrice:= dTotal / strToFloat(s1);
+  stgInvLine.Enabled:= True;
+  stgEditQty.Text:= '1';
   CalcPrices;
-  stgInvLine.Refresh;
-  stgInvLine.SetFocus;
-  PostKeyEx32(VK_DOWN,[], False);    // See Globals
+  iRow:= iRow + 1;
+  stgInvLine.RowCount:= stgInvLine.RowCount + 1;
+//  PostKeyEx32(VK_DOWN,[], False);    // See Globals
 End;
 
+
+
+procedure TfInvoice.cbxItemCodeEnter(Sender: TObject);
+begin
+  stgInvLine.Cells[0, iRow]:= IntToStr(iRow);
+  stgEditQty.Text:= '0';
+  ItemSelected;
+end;
 
 
 Procedure TfInvoice.cbxItemCodeExit(Sender: TObject);
 Begin
-  ItemSelected;
-End;
-
-
-Procedure TfInvoice.cbxItemCodeChange(Sender: TObject);
-Begin
+  stgEditQty.Text:= '1';
   ItemSelected;
 End;
 

@@ -29,6 +29,7 @@ type
     procedure RecordInv(InvObj: TInvClass);
     procedure RecordInvTotal(InvObj: TInvClass);
     Function  FindItemID(sItemCode: String):Integer;
+    Procedure SelectItems;
     Function  CustAddress(LineNo: Integer): String;
     Function  CustShipTo(LineNo: Integer): String;
     Function  GetNextInvID:Integer;
@@ -77,6 +78,14 @@ begin
   dstItem.Active:= False;
   dstCustomer.Active := False;
 End;
+
+
+procedure TdmoInvoice.SelectItems;
+begin
+  dstItem.Active:= False;
+  dstItem.CommandText:= 'Select * FROM Item where IsInactive = False';
+  dstItem.Active:= True;
+end;
 
 
 Function TdmoInvoice.FindItemID(sItemCode: String): Integer;
@@ -184,7 +193,7 @@ end;
 procedure TdmoInvoice.RecordInvLine(InvLineObj: TInvLineClass);
 Var
   iInvLineID: Integer;
-  s1, sItemID: String;
+  s1: String;
 begin
   iInvLineID:= GetNextInvLineID;
   s1:= 'InvLineID = ' + IntToStr(iInvLineID) + CRLF
@@ -197,8 +206,7 @@ begin
             + 'Unit Price = ' + FloatToStr(InvLineObj.TaxIncUnitPrice) + CRLF
             + 'Line Total Inc GST = ' + FloatToStr(InvLineObj.TaxIncTotal);
   Information(s1);
-  sItemID:= IntToStr(dstItem.FieldByName('ItemID').AsInteger);
-   s1:= 'Insert INTO InvLine (InvLineID, InvID, LineNumber, ItemID, '
+  s1:= 'Insert INTO InvLine (InvLineID, InvID, LineNumber, ItemID, '
             + 'Description, Quantity, TaxIncUnitPrice, TaxIncTotal) '
             + 'VALUES ('
             + IntToStr(iInvLineID) +', '
@@ -211,8 +219,8 @@ begin
             + FloatToStr(InvLineObj.TaxIncTotal) + ')';
   AdoCommand1.CommandText:= s1;
   ADOCommand1.Execute;
-  qryInvLine.Active:= False;
-  qryInvLine.Active:= True;
+//  qryInvLine.Active:= False;
+//  qryInvLine.Active:= True;
 End;
 
 procedure TdmoInvoice.RecordInvTotal(InvObj: TInvClass);
@@ -224,6 +232,7 @@ begin
   ADOCommand1.Execute;
 end;
 
+
 procedure TdmoInvoice.SetDstCustCommand;
 begin
   sCustCommand :=
@@ -234,6 +243,7 @@ begin
     'FROM Card INNER JOIN Member ON Card.CardID = Member.CardID';
   sCustOrderBy := ' ORDER BY [SurName] +" " + [FirstName] + " " + [PostCity]';
 End;
+
 
 procedure TdmoInvoice.FillInvObj(VAR InvObj: TInvClass);
 var
@@ -256,6 +266,7 @@ begin
   InvObj.InvTotal:= 0.00;
   InvObj.Recorded:= False;
 End;
+
 
 function TdmoInvoice.CustAddress(LineNo: Integer): String;
 var
@@ -281,6 +292,7 @@ begin
     End;
   end;
 End;
+
 
 function TdmoInvoice.CustShipTo(LineNo: Integer): String;
 var

@@ -188,6 +188,7 @@ object fInvoice: TfInvoice
       Align = alClient
       ColCount = 6
       DefaultColWidth = 100
+      Enabled = False
       FixedCols = 0
       RowCount = 2
       FixedRows = 0
@@ -214,8 +215,7 @@ object fInvoice: TfInvoice
       TabOrder = 1
       Text = 'cbxItemCode'
       Visible = False
-      OnChange = cbxItemCodeChange
-      OnExit = cbxItemCodeExit
+      OnEnter = cbxItemCodeEnter
     end
     object stgEditDescription: TEdit
       Left = 252
@@ -223,7 +223,7 @@ object fInvoice: TfInvoice
       Width = 121
       Height = 21
       TabOrder = 2
-      Text = 'stgEditDescription'
+      Text = 'Description'
       Visible = False
       OnChange = stgEditDescriptionChange
     end
@@ -233,7 +233,7 @@ object fInvoice: TfInvoice
       Width = 121
       Height = 21
       TabOrder = 3
-      Text = 'stgEditQty'
+      Text = 'Qty'
       Visible = False
       OnExit = stgEditQtyExit
       OnKeyUp = stgEditQtyKeyUp
@@ -245,7 +245,7 @@ object fInvoice: TfInvoice
       Height = 21
       NumbersOnly = True
       TabOrder = 5
-      Text = 'stgEditTotal'
+      Text = 'Total'
       Visible = False
       OnExit = stgEditTotalExit
     end
@@ -256,7 +256,7 @@ object fInvoice: TfInvoice
       Height = 21
       NumbersOnly = True
       TabOrder = 4
-      Text = 'stgEditPrice'
+      Text = 'Price'
       Visible = False
       OnExit = stgEditPriceExit
     end
