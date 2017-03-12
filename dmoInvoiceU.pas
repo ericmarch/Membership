@@ -173,8 +173,8 @@ begin
       Error('Exception message = '+E.Message);
     End;
   End;
-  qryInvoice.Active:= False;
-  qryInvoice.Active:= True;
+//  qryInvoice.Active:= False;
+//  qryInvoice.Active:= True;
 end;
 
 
@@ -196,16 +196,16 @@ Var
   s1: String;
 begin
   iInvLineID:= GetNextInvLineID;
-  s1:= 'InvLineID = ' + IntToStr(iInvLineID) + CRLF
-            + 'InvID = ' + IntToStr(InvLineObj.InvID) + CRLF
-            + 'LineNumber = ' + IntToStr(InvLineObj.LineNumber) + CRLF
-            + 'ItemID = ' + IntToStr(InvLineObj.ItemID) + CRLF
-            + 'Item Code = ' + QuotedStr(InvLineObj.ItemCode) + CRLF
-            + 'Description = ' + QuotedStr(InvLineObj.Description) + CRLF
-            + 'Quantity = ' + FloatToStr(InvLineObj.Quantity) + CRLF
-            + 'Unit Price = ' + FloatToStr(InvLineObj.TaxIncUnitPrice) + CRLF
-            + 'Line Total Inc GST = ' + FloatToStr(InvLineObj.TaxIncTotal);
-  Information(s1);
+//  s1:= 'InvLineID = ' + IntToStr(iInvLineID) + CRLF
+//            + 'InvID = ' + IntToStr(InvLineObj.InvID) + CRLF
+//            + 'LineNumber = ' + IntToStr(InvLineObj.LineNumber) + CRLF
+//            + 'ItemID = ' + IntToStr(InvLineObj.ItemID) + CRLF
+//            + 'Item Code = ' + QuotedStr(InvLineObj.ItemCode) + CRLF
+//            + 'Description = ' + QuotedStr(InvLineObj.Description) + CRLF
+//            + 'Quantity = ' + FloatToStr(InvLineObj.Quantity) + CRLF
+//            + 'Unit Price = ' + FloatToStr(InvLineObj.TaxIncUnitPrice) + CRLF
+//            + 'Line Total Inc GST = ' + FloatToStr(InvLineObj.TaxIncTotal);
+//  Information(s1);
   s1:= 'Insert INTO InvLine (InvLineID, InvID, LineNumber, ItemID, '
             + 'Description, Quantity, TaxIncUnitPrice, TaxIncTotal) '
             + 'VALUES ('
@@ -219,8 +219,6 @@ begin
             + FloatToStr(InvLineObj.TaxIncTotal) + ')';
   AdoCommand1.CommandText:= s1;
   ADOCommand1.Execute;
-//  qryInvLine.Active:= False;
-//  qryInvLine.Active:= True;
 End;
 
 procedure TdmoInvoice.RecordInvTotal(InvObj: TInvClass);

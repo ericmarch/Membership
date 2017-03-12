@@ -85,7 +85,7 @@ type
     Procedure ItemPickList;
     Procedure ItemSelected;
     Procedure CalcPrices;
-    Procedure LoadInvLine;
+    Procedure LoadInvLine(iLineNumber: Integer);
     Function  fourDecimalPlaces(str: String):String;
     Function  ItemInList(sItemCode: String):Boolean;
   public
@@ -279,26 +279,26 @@ Begin
 End;
 
 
-Procedure TfInvoice.LoadInvLine;
+Procedure TfInvoice.LoadInvLine(iLineNumber: Integer);
 var
   d1, d2, d3: Double;
+  s1, s2, s3: String;
 Begin
-  d1:= StrToFloatDEF(AnsiReplaceStr(MyStripout(stgEditQty.Text),'$', ''), 0);
+  s1:= stgInvLine.Cells[3, iLineNumber];         // Qty
+  d1:= StrToFloatDEF(AnsiReplaceStr(MyStripout(s1),'$', ''), 0);
   if (d1 > 0) then
   Begin
-    stgInvLine.Cells[3, iRow]:= stgEditQty.Text;
-    d2:= StrToFloatDEF(AnsiReplaceStr(MyStripout(stgEditPrice.Text), '$', ''), 0);
-    stgInvLine.Cells[4, iRow]:= stgEditPrice.Text;
-    d3:= StrToFloatDEF(AnsiReplaceStr(MyStripout(stgEditTotal.Text), '$', ''), 0);
-    stgInvLine.Cells[5, iRow]:= stgEditTotal.Text;
-    stgInvLine.Row:= iRow;
+    s2:= stgInvLine.Cells[1, iLineNumber];       // ItemCode
+    s3:= stgInvLine.Cells[2, iLineNumber];       // Description
+    s1:= stgInvLine.Cells[4, iLineNumber];       // Price
+    d2:= StrToFloatDEF(AnsiReplaceStr(MyStripout(s1), '$', ''), 0);
+    s1:= stgInvLine.Cells[5, iLineNumber];       // Total Cost
+    d3:= StrToFloatDEF(AnsiReplaceStr(MyStripout(s1), '$', ''), 0);
     InvLineObj.InvID:= InvObj.InvID;
-    InvLineObj.LineNumber:= iRow;
-    InvLineObj.ItemCode:= cbxItemCode.Text;
-    stgInvLine.Cells[1, iRow]:= stgEditTotal.Text;
+    InvLineObj.LineNumber:= iLineNumber;
+    InvLineObj.ItemCode:= s2;
     InvLineObj.ItemID:= dmoInvoice.FindItemID(InvLineObj.ItemCode);
-    InvLineObj.Description:= stgEditDescription.Text;
-    stgInvLine.Cells[2, iRow]:= stgEditDescription.Text;
+    InvLineObj.Description:= s3;
     InvLineObj.Quantity:= d1;
     InvLineObj.TaxIncUnitPrice:= d2;
     InvLineObj.TaxIncTotal:= d3;
@@ -331,11 +331,13 @@ Begin
   Begin
     If AnsiReplaceStr(MyStripout(stgInvLine.Cells[3, iRow]),'$', '') <> '0.00' Then
     Begin
-      LoadInvLine;
+      LoadInvLine(iNN);
       dmoInvoice.RecordInvLine(InvLineObj);
       InvObj.InvTotal:= InvObj.InvTotal + InvLineObj.TaxIncTotal;
     End;
   End;
+  if InvObj.InvTotal <> 0 then
+    dmoInvoice.RecordInvTotal(InvObj);
   HideStgDataBoxes(True);
   FormReset;
   spdBtnInvRecord.Enabled:= False;
